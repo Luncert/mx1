@@ -25,7 +25,7 @@ public class BannerLoader {
     String banner = defaultValue;
     
     // load from disk
-    URL url = App.class.getClassLoader().getResource("banner.txt");
+    URL url = ProbeDaemon.class.getClassLoader().getResource("banner.txt");
     if (url != null) {
       try {
         InputStream inputStream = url.openStream();
