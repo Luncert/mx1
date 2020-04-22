@@ -1,9 +1,9 @@
-package org.luncert.mx1.probe.daemon;
+package org.luncert.mx1.probe.daemon.pojo;
 
 import lombok.Data;
 
 @Data
-class Config {
+public class Config {
   
   private String centralServer;
 }

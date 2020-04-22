@@ -5,9 +5,9 @@ import java.io.OutputStream;
 /**
  * ref: https://stackoverflow.com/questions/25396664/shared-memory-between-two-jvms
  */
-public abstract class AbstractStubDataReceiver {
+public interface IStubDataReceiver {
   
-  public abstract void transport(OutputStream outputStream);
+  void transport(OutputStream outputStream);
   
-  public abstract void destroy();
+  void destroy();
 }

@@ -1,9 +1,11 @@
 package org.luncert.mx1.probe.daemon;
 
-public class ProbeDaemon {
+import org.luncert.mx1.probe.daemon.pojo.Config;
+
+public class ProbeDaemonMain {
   
   public static void main(String[] args) {
-    ProbeDaemon app = new ProbeDaemon();
+    ProbeDaemonMain app = new ProbeDaemonMain();
     app.start(args);
   }
   
@@ -14,6 +16,8 @@ public class ProbeDaemon {
       System.exit(1);
     }
   
-    BannerLoader.print("");
+    BannerLoader.print("{brightGreen:mx1probe-daemon} by {brightCyan:Luncert}");
+    
+    IStubDataReceiver stubDataReceiver = ;
   }
 }

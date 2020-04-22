@@ -19,13 +19,17 @@ import java.util.Map;
  * smslant
  */
 @Slf4j
-public class BannerLoader {
+class BannerLoader {
   
-  public static void print(String defaultValue) {
+  /**
+   * print banner
+   * @param defaultValue default banner, will be used when banner.txt doesn't exist
+   */
+  static void print(String defaultValue) {
     String banner = defaultValue;
     
     // load from disk
-    URL url = ProbeDaemon.class.getClassLoader().getResource("banner.txt");
+    URL url = ProbeDaemonMain.class.getClassLoader().getResource("banner.txt");
     if (url != null) {
       try {
         InputStream inputStream = url.openStream();

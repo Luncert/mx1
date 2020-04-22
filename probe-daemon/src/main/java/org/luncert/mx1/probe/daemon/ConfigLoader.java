@@ -10,10 +10,12 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.AnsiConsole;
+import org.luncert.mx1.probe.daemon.pojo.Config;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -26,10 +28,10 @@ class ConfigLoader {
           .desc("help").hasArg(false)
           .build())
       .add(Option.builder("s").longOpt("server")
-          .desc("address of central server").hasArg(false)
+          .desc("address of central server").hasArg(true)
           .build())
       .add(Option.builder("c").longOpt("config")
-          .desc("config file path").hasArg(false)
+          .desc("config file path").hasArg(true)
           .build())
       .build();
   
@@ -42,7 +44,6 @@ class ConfigLoader {
         printUsage();
         System.exit(0);
       }
-      
       Config config;
       if (cmd.hasOption("c")) {
         config = ConfigLoader.load(new File(cmd.getOptionValue("c")));
