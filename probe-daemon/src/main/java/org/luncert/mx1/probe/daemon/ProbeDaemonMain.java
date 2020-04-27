@@ -18,6 +18,6 @@ public class ProbeDaemonMain {
   
     BannerLoader.print("{brightGreen:mx1probe-daemon} by {brightCyan:Luncert}");
     
-    IStubDataReceiver stubDataReceiver = ;
+    //IStubDataReceiver stubDataReceiver = ;
   }
 }

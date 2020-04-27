@@ -1,0 +1,2 @@
+FROM ascdc/jdk8:latest
+
