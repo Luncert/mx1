@@ -1,4 +1,4 @@
-package org.luncert.mx1.probe.pojo;
+package org.luncert.mx1.probe.data.staticinfo;
 
 import lombok.Data;
 

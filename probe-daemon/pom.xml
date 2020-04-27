@@ -8,7 +8,7 @@
   <artifactId>probe-daemon</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>probe-daemon</name>
+  <name>mx1probe-daemon</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
