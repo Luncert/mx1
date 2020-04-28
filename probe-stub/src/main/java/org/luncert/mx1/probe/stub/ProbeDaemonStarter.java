@@ -40,13 +40,13 @@ class ProbeDaemonStarter {
     List<String> command = ImmutableList.<String>builder()
         .addAll(CMD_PRE_ARGS)
         .add("service") // run the service
-        .add("--DisplayName").add("mx1probe-daemon")
-        .add("--Startup").add("auto")
-        .add("--StartMode").add("jvm")
-        .add("--StopMode").add("jvm")
-        .add("--StartClass").add("org.luncert.mx1.probe.daemon.ProbeDaemonMain")
-        .add("--StopClass").add("org.luncert.mx1.probe.daemon.ProbeDaemonMain")
-        .add("--Classpath").add(findProbeDaemonJar())
+        .add("--DisplayName=mx1probe-daemon")
+        .add("--Startup=auto")
+        .add("--StartMode=jvm")
+        .add("--StopMode=jvm")
+        .add("--StartClass=org.luncert.mx1.probe.daemon.ProbeDaemonMain")
+        .add("--StopClass=org.luncert.mx1.probe.daemon.ProbeDaemonMain")
+        .add("--Classpath=" + findProbeDaemonJar())
         .build();
   
     try {
