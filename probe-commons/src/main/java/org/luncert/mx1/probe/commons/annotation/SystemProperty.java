@@ -1,4 +1,4 @@
-package org.luncert.mx1.probe.stub.annotation;
+package org.luncert.mx1.probe.commons.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

@@ -10,18 +10,17 @@ import java.lang.instrument.Instrumentation;
 public class ProbeStubMain {
   
   public static void premain(String agentOptions, Instrumentation instrumentation) {
-    main(new String[]{});
+    log.debug("Probe Stub on.");
+  
+    MavenStaticInfoCollector collector = new MavenStaticInfoCollector();
+    System.out.println(collector.collect());
+  
+    instrumentation
+  
+    //Runtime.getRuntime().addShutdownHook();
   }
   
   public static void main(String[] args) {
-    log.debug("Probe Stub on.");
-    
-    // start probe-daemon
-    ProbeDaemonStarter.start();
-  
-    MavenStaticInfoCollector collector = new MavenStaticInfoCollector();
-    collector.collect();
-    
-    //Runtime.getRuntime().addShutdownHook();
+    premain(null, null);
   }
 }

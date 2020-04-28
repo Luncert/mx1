@@ -1,7 +1,7 @@
-package org.luncert.mx1.probe.stub.util;
+package org.luncert.mx1.probe.commons.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.luncert.mx1.probe.stub.annotation.SystemProperty;
+import org.luncert.mx1.probe.commons.annotation.SystemProperty;
 
 import java.lang.reflect.Field;
 

@@ -1,7 +1,7 @@
 package org.luncert.mx1.probe.stub.component;
 
 import org.luncert.mx1.probe.commons.data.staticinfo.SystemStaticInfo;
-import org.luncert.mx1.probe.stub.util.SystemPropertiesUtil;
+import org.luncert.mx1.probe.commons.util.SystemPropertiesUtil;
 
 public class SystemStaticInfoCollector extends AbstractInfoCollector<SystemStaticInfo> {
   

@@ -12,3 +12,4 @@ CustomerReporter：实现ScheduledReporter将metrics发送到CollectorDaemon
 * jvm system properties: https://blog.csdn.net/u013007900/article/details/50428943/
 * sigar: https://www.cnblogs.com/perkins/p/7743511.html
 * 获取JVM参数:https://www.cnblogs.com/BINGJJFLY/p/7610431.html
+* build specified module: mvn package -DskipTests -pl module -am

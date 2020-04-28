@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MavenStaticInfo {
+public class MavenPomInfo {
   
-  private List<MavenPomInfo> poms;
+  private String path;
+  
+  private String content;
 }

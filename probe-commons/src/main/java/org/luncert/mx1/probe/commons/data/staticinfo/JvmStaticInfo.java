@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.luncert.mx1.probe.stub.annotation.SystemProperty;
+import org.luncert.mx1.probe.commons.annotation.SystemProperty;
 
 import java.util.List;
 
