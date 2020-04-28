@@ -13,3 +13,5 @@ CustomerReporter：实现ScheduledReporter将metrics发送到CollectorDaemon
 * sigar: https://www.cnblogs.com/perkins/p/7743511.html
 * 获取JVM参数:https://www.cnblogs.com/BINGJJFLY/p/7610431.html
 * build specified module: mvn package -DskipTests -pl module -am
+* agent and app are using the same AppClassLoader and PlatformClassLoader (as same as ExtensionClassLoader)
+* to get the main class, we have to break the parent delegation model

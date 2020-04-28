@@ -7,6 +7,7 @@ import org.luncert.mx1.probe.commons.data.staticinfo.MavenStaticInfo;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -38,6 +39,8 @@ public class MavenStaticInfoCollector extends AbstractInfoCollector<MavenStaticI
           .getCodeSource().getLocation().toURI().getPath();
       File root = new File(codeSourcePath);
       System.out.println(codeSourcePath);
+      
+      System.out.println(ManagementFactory.getRuntimeMXBean().getInputArguments());
     } catch (URISyntaxException e) {
       e.printStackTrace();
     }

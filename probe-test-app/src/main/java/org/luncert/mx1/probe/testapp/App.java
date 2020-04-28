@@ -7,6 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class App {
   
   public static void main(String[] args) {
+    ClassLoader loader = App.class.getClassLoader();
+    while (loader != null) {
+      System.out.println(loader);
+      loader = loader.getParent();
+    }
     SpringApplication.run(App.class);
   }
 }
