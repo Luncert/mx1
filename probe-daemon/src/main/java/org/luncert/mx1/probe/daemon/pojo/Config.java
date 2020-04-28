@@ -6,4 +6,6 @@ import lombok.Data;
 public class Config {
   
   private String centralServer;
+  
+  private boolean noBanner;
 }

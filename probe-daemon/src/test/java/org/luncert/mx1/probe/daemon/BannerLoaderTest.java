@@ -3,7 +3,6 @@ package org.luncert.mx1.probe.daemon;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.luncert.mx1.probe.daemon.BannerLoader;
 
 @RunWith(JUnit4.class)
 public class BannerLoaderTest {

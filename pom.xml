@@ -13,6 +13,7 @@
     <!-- build probe-daemon at first -->
     <module>probe-daemon</module>
     <module>probe-stub</module>
+    <module>probe-commons</module>
   </modules>
 
   <build>

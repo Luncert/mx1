@@ -15,11 +15,11 @@ import org.luncert.mx1.probe.daemon.pojo.Config;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
+// https://commons.apache.org/proper/commons-cli/usage.html
 @Slf4j
 class ConfigLoader {
   
@@ -32,6 +32,9 @@ class ConfigLoader {
           .build())
       .add(Option.builder("c").longOpt("config")
           .desc("config file path").hasArg(true)
+          .build())
+      .add(Option.builder("noBanner").longOpt("noBanner")
+          .desc("do not print banner").hasArg(false)
           .build())
       .build();
   
@@ -56,6 +59,10 @@ class ConfigLoader {
           log.warn("config file field was overwritten by cmd args: centralServer");
         }
         config.setCentralServer(cmd.getOptionValue("s"));
+      }
+      
+      if (cmd.hasOption("noBanner")) {
+        config.setNoBanner(true);
       }
       
       return config;

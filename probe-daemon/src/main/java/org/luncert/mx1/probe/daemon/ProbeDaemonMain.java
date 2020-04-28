@@ -1,23 +1,40 @@
 package org.luncert.mx1.probe.daemon;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.daemon.Daemon;
+import org.apache.commons.daemon.DaemonContext;
+import org.apache.commons.daemon.DaemonInitException;
 import org.luncert.mx1.probe.daemon.pojo.Config;
 
-public class ProbeDaemonMain {
+@Slf4j
+public class ProbeDaemonMain implements Daemon {
   
-  public static void main(String[] args) {
-    ProbeDaemonMain app = new ProbeDaemonMain();
-    app.start(args);
+  private Config config;
+  
+  @Override
+  public void init(DaemonContext daemonContext) throws DaemonInitException {
+    String[] args = daemonContext.getArguments();
+    config = ConfigLoader.load(args);
   }
   
-  private void start(String[] args) {
-    // https://commons.apache.org/proper/commons-cli/usage.html
-    Config config = ConfigLoader.load(args);
-    if (config == null) {
-      System.exit(1);
+  @Override
+  public void start() throws Exception {
+    if (config.isNoBanner()) {
+      log.info("Probe-daemon on.");
+    } else {
+      BannerLoader.print("{brightGreen:mx1probe-daemon} by {brightCyan:Luncert}");
     }
   
-    BannerLoader.print("{brightGreen:mx1probe-daemon} by {brightCyan:Luncert}");
-    
     //IStubDataReceiver stubDataReceiver = ;
+  }
+  
+  @Override
+  public void stop() throws Exception {
+    log.info("Probe-daemon off.");
+  }
+  
+  @Override
+  public void destroy() {
+  
   }
 }
