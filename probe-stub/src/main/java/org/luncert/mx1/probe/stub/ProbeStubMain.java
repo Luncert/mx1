@@ -8,6 +8,7 @@ import org.luncert.mx1.probe.spy.ProbeSpy;
 import org.luncert.mx1.probe.spy.exception.LoadProbeSpyJarError;
 import org.luncert.mx1.probe.stub.component.AgentTransformer;
 import org.luncert.mx1.probe.stub.component.MavenStaticInfoCollector;
+import org.luncert.mx1.probe.stub.component.SpringStaticInfoCollector;
 import org.luncert.mx1.probe.stub.exeception.ProbeSpyJarNotFoundError;
 
 import java.io.ByteArrayOutputStream;
@@ -38,7 +39,9 @@ public class ProbeStubMain {
     setupProbeSpy(inst);
     
     inst.addTransformer(new AgentTransformer());
-    
+  
+    SpringStaticInfoCollector collector = new SpringStaticInfoCollector();
+    System.out.println(collector.collect());
     //Runtime.getRuntime().addShutdownHook();
   }
   

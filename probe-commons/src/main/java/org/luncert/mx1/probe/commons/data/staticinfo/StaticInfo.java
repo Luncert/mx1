@@ -10,4 +10,6 @@ public class StaticInfo {
   private JvmStaticInfo jvmStaticInfo;
   
   private MavenStaticInfo mavenStaticInfo;
+  
+  private SpringStaticInfo springStaticInfo;
 }

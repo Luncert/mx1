@@ -27,17 +27,17 @@ public final class ProbeSpy {
     probeEventHandlerMap.put(evtName, handler);
   }
   
-  public static Object fireEvent(String evtName) {
+  public static <T> T fireEvent(String evtName) {
     return fireEvent(evtName, null);
   }
   
   @SuppressWarnings("unchecked")
-  public static Object fireEvent(String evtName, Object data) {
+  public static <T> T fireEvent(String evtName, Object data) {
     ProbeEventHandler handler = probeEventHandlerMap.get(evtName);
     if (handler != null) {
       Event event = new Event(evtName, data);
       log.debug("{} accepted by {}", event, handler.getClass());
-      return handler.handle(event);
+      return (T) handler.handle(event);
     }
     
     return null;
