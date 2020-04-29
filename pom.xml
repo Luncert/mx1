@@ -9,11 +9,14 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <name>mx1probe</name>
+
   <modules>
     <!-- build probe-daemon at first -->
     <module>probe-daemon</module>
     <module>probe-stub</module>
     <module>probe-commons</module>
+    <module>probe-spy</module>
   </modules>
 
   <build>

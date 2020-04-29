@@ -15,3 +15,5 @@ CustomerReporter：实现ScheduledReporter将metrics发送到CollectorDaemon
 * build specified module: mvn package -DskipTests -pl module -am
 * agent and app are using the same AppClassLoader and PlatformClassLoader (as same as ExtensionClassLoader)
 * to get the main class, we have to break the parent delegation model
+* https://blogs.oracle.com/ouchina/javaagent
+* https://speakerdeck.com/shelajev/taming-javaagents-bcn-jug-2015

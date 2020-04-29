@@ -21,7 +21,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <main-class>org.luncert.mx1.probe.stub.ProbeStubMain</main-class>
     <package-name>${project.name}-${project.version}</package-name>
-    <probe-daemon-dist>mx1probe-daemon-${project.version}.jar</probe-daemon-dist>
+    <probe-spy-dist>mx1probe-spy-${project.version}.jar</probe-spy-dist>
   </properties>
 
   <dependencies>
@@ -30,6 +30,24 @@
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.30</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/commons-daemon/commons-daemon -->
@@ -93,6 +111,13 @@
       <version>1.0.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.luncert.mx1</groupId>
+      <artifactId>probe-spy</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -127,25 +152,25 @@
           </execution>
         </executions>
       </plugin>
-      <!-- copy probe-daemon.jar to src/resources/ -->
-<!--      <plugin>-->
-<!--        <artifactId>maven-antrun-plugin</artifactId>-->
-<!--        <version>3.0.0</version>-->
-<!--        <executions>-->
-<!--          <execution>-->
-<!--            <phase>compile</phase>-->
-<!--            <goals>-->
-<!--              <goal>run</goal>-->
-<!--            </goals>-->
-<!--            <configuration>-->
-<!--              <target>-->
-<!--                <copy overwrite="true" file="../probe-daemon/target/${probe-daemon-dist}"-->
-<!--                      tofile="${project.build.outputDirectory}/${probe-daemon-dist}" />-->
-<!--              </target>-->
-<!--            </configuration>-->
-<!--          </execution>-->
-<!--        </executions>-->
-<!--      </plugin>-->
+      <!-- copy probe-spy.jar to output directory -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <copy overwrite="true" file="../probe-spy/target/${probe-spy-dist}"
+                      tofile="${project.build.outputDirectory}/mx1probe-spy.jar" />
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -2,11 +2,16 @@ package org.luncert.mx1.probe.stub.component;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.luncert.mx1.probe.commons.data.staticinfo.MavenPomInfo;
 import org.luncert.mx1.probe.commons.data.staticinfo.MavenStaticInfo;
+import org.luncert.mx1.probe.spy.ProbeSpy;
+import org.luncert.mx1.probe.stub.common.ProbeSpyEvent;
+import org.luncert.mx1.probe.stub.exeception.LoadMavenPomError;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -17,6 +22,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 /**
  * To test this function, test app must be run with java directly,
@@ -26,6 +34,10 @@ import java.util.List;
 @Slf4j
 public class MavenStaticInfoCollector extends AbstractInfoCollector<MavenStaticInfo> {
   
+  private static final String MAVEN_PATH_IN_JAR = "META-INF/maven/";
+  
+  private static final String POM_NAME = "pom.xml";
+  
   @Override
   public MavenStaticInfo collect() {
     MavenStaticInfo info = new MavenStaticInfo();
@@ -34,16 +46,30 @@ public class MavenStaticInfoCollector extends AbstractInfoCollector<MavenStaticI
   }
   
   private List<MavenPomInfo> loadPoms() {
-    try {
-      String codeSourcePath = MavenStaticInfoCollector.class.getProtectionDomain()
-          .getCodeSource().getLocation().toURI().getPath();
-      File root = new File(codeSourcePath);
-      System.out.println(codeSourcePath);
-      
-      System.out.println(ManagementFactory.getRuntimeMXBean().getInputArguments());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
+    String classpath = ManagementFactory.getRuntimeMXBean().getClassPath();
+    if (classpath.endsWith(".jar")) {
+      try {
+        List<MavenPomInfo> infoList = new ArrayList<>();
+        
+        // find all pom.xml in target app jar file
+        JarFile appJar = new JarFile(classpath);
+        for (Enumeration<JarEntry> entries = appJar.entries(); entries.hasMoreElements(); ) {
+          JarEntry entry = entries.nextElement();
+          String entryName = entry.getName();
+          // do filtering
+          if (entryName.startsWith(MAVEN_PATH_IN_JAR) && entryName.endsWith(POM_NAME)) {
+            InputStream pomInputStream = appJar.getInputStream(appJar.getEntry(entryName));
+            String pomContent = IOUtils.toString(pomInputStream, Charset.defaultCharset());
+            infoList.add(new MavenPomInfo(entryName.replace(MAVEN_PATH_IN_JAR, ""), pomContent));
+          }
+        }
+        
+        return infoList;
+      } catch (IOException e) {
+        throw new LoadMavenPomError(e);
+      }
     }
+    
     return Collections.emptyList();
   }
 }
