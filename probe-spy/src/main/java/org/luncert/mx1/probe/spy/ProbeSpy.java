@@ -1,6 +1,5 @@
 package org.luncert.mx1.probe.spy;
 
-import lombok.extern.slf4j.Slf4j;
 import org.luncert.mx1.probe.spy.exception.EventHandlerExistedError;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Used to connect target app and probe.
  * Will be added to Bootstrap Classloader's search path.
  */
-@Slf4j
 public final class ProbeSpy {
   
   private static final ConcurrentHashMap<String, ProbeEventHandler> probeEventHandlerMap
@@ -36,7 +34,6 @@ public final class ProbeSpy {
     ProbeEventHandler handler = probeEventHandlerMap.get(evtName);
     if (handler != null) {
       Event event = new Event(evtName, data);
-      log.debug("{} accepted by {}", event, handler.getClass());
       return (T) handler.handle(event);
     }
     

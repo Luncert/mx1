@@ -1,4 +1,4 @@
-package org.luncert.mx1.probe.stub.component;
+package org.luncert.mx1.probe.stub.component.staticInfoCollector;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -7,6 +7,7 @@ import org.luncert.mx1.probe.commons.data.staticinfo.MavenPomInfo;
 import org.luncert.mx1.probe.commons.data.staticinfo.MavenStaticInfo;
 import org.luncert.mx1.probe.spy.ProbeSpy;
 import org.luncert.mx1.probe.stub.common.ProbeSpyEvent;
+import org.luncert.mx1.probe.stub.component.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.exeception.LoadMavenPomError;
 
 import java.io.File;

@@ -1,4 +1,4 @@
-package org.luncert.mx1.probe.spy.exception;
+package org.luncert.mx1.probe.stub.exeception;
 
 public class LoadProbeSpyJarError extends RuntimeException {
   

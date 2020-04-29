@@ -1,29 +1,21 @@
 package org.luncert.mx1.probe.stub;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.daemon.Daemon;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.luncert.mx1.probe.spy.ProbeSpy;
-import org.luncert.mx1.probe.spy.exception.LoadProbeSpyJarError;
-import org.luncert.mx1.probe.stub.component.AgentTransformer;
-import org.luncert.mx1.probe.stub.component.MavenStaticInfoCollector;
-import org.luncert.mx1.probe.stub.component.SpringStaticInfoCollector;
+import org.luncert.mx1.probe.stub.exeception.LoadProbeSpyJarError;
+import org.luncert.mx1.probe.stub.component.AgentTransformerFactory;
+import org.luncert.mx1.probe.stub.component.staticInfoCollector.SpringStaticInfoCollector;
 import org.luncert.mx1.probe.stub.exeception.ProbeSpyJarNotFoundError;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
 import java.util.jar.JarFile;
@@ -33,21 +25,26 @@ public class ProbeStubMain {
   
   private static final String SPY_JAR_NAME = "mx1probe-spy.jar";
   
-  public static void premain(String agentOptions, Instrumentation inst) {
+  private static final String PROBE_SPY_CLASS = "org.luncert.mx1.probe.spy.ProbeSpy";
+  
+  public static void premain(String agentOptions, Instrumentation inst) throws ClassNotFoundException {
     log.debug("Probe Stub on.");
   
     setupProbeSpy(inst);
-    
-    inst.addTransformer(new AgentTransformer());
+  
+    ClassFileTransformer transformer = AgentTransformerFactory.createTransformer();
+    inst.addTransformer(transformer);
   
     SpringStaticInfoCollector collector = new SpringStaticInfoCollector();
     System.out.println(collector.collect());
     //Runtime.getRuntime().addShutdownHook();
   }
   
-  private static void setupProbeSpy(Instrumentation inst) {
+  private static void setupProbeSpy(Instrumentation inst) throws ClassNotFoundException {
+    // according to parent delegation model,
+    // classes in probe-spy will be loaded by BootstrapClassLoader
     inst.appendToBootstrapClassLoaderSearch(loadProbeSpyJar());
-    // TODO: register handlers
+    //// TODO: register handlers
   }
   
   private static JarFile loadProbeSpyJar() {
@@ -59,32 +56,29 @@ public class ProbeStubMain {
     if (spyJarInputStream == null) {
       throw new ProbeSpyJarNotFoundError("mx1probe-spy.jar missing in classpath.");
     }
-  
+
     try {
       // read spy jar to memory
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       IOUtils.copy(spyJarInputStream, byteArrayOutputStream);
-      
+
       byte[] spyJarRaw = byteArrayOutputStream.toByteArray();
-      
+
       // build tmp output path
       File tmpDir = FileUtils.getTempDirectory();
       String spyJarPath = Paths.get(tmpDir.getAbsolutePath(), SPY_JAR_NAME).toString();
       
       // write to spyJarRaw to tmp file
+      // NOTICE: invalid CEN header (bad signature)
       RandomAccessFile file = new RandomAccessFile(spyJarPath, "rw");
-      FileChannel fileChannel = file.getChannel();
-      fileChannel.write(ByteBuffer.wrap(spyJarRaw));
-      fileChannel.close();
-  
+      file.setLength(spyJarRaw.length);
+      file.getChannel().write(ByteBuffer.wrap(spyJarRaw));
+      file.close();
+      
       // create JarFile
       return new JarFile(spyJarPath);
     } catch (IOException e) {
       throw new LoadProbeSpyJarError(e);
     }
-  }
-  
-  public static void main(String[] args) {
-    premain(null, null);
   }
 }

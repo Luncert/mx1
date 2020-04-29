@@ -1,10 +1,14 @@
 package org.luncert.mx1.probe.commons.util;
 
+import org.apache.commons.io.output.NullOutputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 public final class IOUtils {
   
@@ -61,5 +65,15 @@ public final class IOUtils {
   public interface StreamConsumer {
     
     void write(byte[] data, int off, int len) throws IOException;
+  }
+  
+  public static long checkSumCRC32(InputStream inputStream) throws IOException {
+    final CRC32 crc = new CRC32();
+  
+    try (InputStream in = new CheckedInputStream(inputStream, crc)) {
+      org.apache.commons.io.IOUtils.copy(in, new NullOutputStream());
+    }
+    
+    return crc.getValue();
   }
 }
