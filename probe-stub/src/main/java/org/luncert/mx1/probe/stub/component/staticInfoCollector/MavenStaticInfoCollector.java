@@ -9,6 +9,7 @@ import org.luncert.mx1.probe.spy.ProbeSpy;
 import org.luncert.mx1.probe.stub.common.ProbeSpyEvent;
 import org.luncert.mx1.probe.stub.component.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.exeception.LoadMavenPomError;
+import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,10 +41,10 @@ public class MavenStaticInfoCollector extends AbstractInfoCollector<MavenStaticI
   private static final String POM_NAME = "pom.xml";
   
   @Override
-  public MavenStaticInfo collect() {
+  public CollectorResponse<MavenStaticInfo> collect() {
     MavenStaticInfo info = new MavenStaticInfo();
     info.setPoms(loadPoms());
-    return info;
+    return CollectorResponse.succeed(info);
   }
   
   private List<MavenPomInfo> loadPoms() {

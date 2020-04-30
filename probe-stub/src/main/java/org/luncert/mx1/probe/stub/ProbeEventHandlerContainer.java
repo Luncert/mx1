@@ -1,7 +1,7 @@
 package org.luncert.mx1.probe.stub;
 
 import org.luncert.mx1.probe.spy.ProbeSpy;
-import org.luncert.mx1.probe.stub.component.SpringContextInjectHandler;
+import org.luncert.mx1.probe.stub.component.probeEventHandler.SpringContextInjectHandler;
 
 public class ProbeEventHandlerContainer {
   

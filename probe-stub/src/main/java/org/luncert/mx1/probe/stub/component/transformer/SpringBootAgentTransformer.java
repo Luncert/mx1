@@ -62,58 +62,61 @@ public class SpringBootAgentTransformer extends AgentTransformer {
                           byte[] classfileBuffer) {
     byte[] byteCode = null;
     String dotSplitClassName = className.replaceAll("/", ".");
-  
-    if (dotSplitClassName.equals(startClass)) {
-      // the start class will be loaded by spring's class loader,
-      // it means the start class hasn't been loaded at now, and our
-      // transformer can't createTransformer the start class
-    } else if (dotSplitClassName.equals(mainClass)) {
-      addClassLoaderToPool(loader);
-  
-      try {
-        CtClass ctClass = classPool.getCtClass(mainClass);
     
-        CtMethod ctMethod = ctClass.getMethod("main", "([Ljava/lang/String;)V");
-
-        ctMethod.insertAfter("System.out.println(\"spy\");");
-    
-        byteCode = ctClass.toBytecode();
-        ctClass.detach();
-      } catch (Exception e) {
-        log.error("Failed to transform class {}.", dotSplitClassName, e);
-      }
-    } else if (dotSplitClassName.equals(SPRING_CONTEXT_CLASS_NAME)) {
-      // modify spring AbstractApplicationContext
-      
-      // add the target class loader to pool
-      // ClassPool will entrust it to find target class and probe-spy
-      addClassLoaderToPool(loader);
-  
-      // When invoke getCtClass, it will assign all classpath
-      // (like the classloader we added above) to find the target class,
-      // by ClassLoader#getResource, not ClassLoader#loadClass.
-      // It brings one problem: although we have add probe-spy.jar to the search path
-      // of the BootstrapClassloader, the class file can't be loaded, but the class can be loaded.
-      //
-      // To solve the problem, we use ProbeSpyResourceClassLoader to load probe-spy's class files.
-      addClassLoaderToPool(ProbeStubMain.getProbeSpyResourceClassLoader());
-      
-      try {
+    try {
+      if (dotSplitClassName.equals(startClass)) {
+        // the start class will be loaded by spring's class loader,
+        // it means the start class hasn't been loaded at now, and our
+        // transformer can't createTransformer the start class
+        // TODO:
+      } else if (dotSplitClassName.equals(mainClass)) {
+        // inspect main-class
+        addClassLoaderToPool(loader);
+        
+        try {
+          CtClass ctClass = classPool.getCtClass(mainClass);
+          
+          CtMethod ctMethod = ctClass.getMethod("main", "([Ljava/lang/String;)V");
+          
+          ctMethod.insertAfter("System.out.println(\"spy\");");
+          
+          byteCode = ctClass.toBytecode();
+          ctClass.detach();
+        } catch (Exception e) {
+          log.error("Failed to transform class {}.", dotSplitClassName, e);
+        }
+      } else if (dotSplitClassName.equals(SPRING_CONTEXT_CLASS_NAME)) {
+        // inspect AbstractApplicationContext
+        
+        // add the target class loader to pool
+        // ClassPool will entrust it to find target class and probe-spy
+        addClassLoaderToPool(loader);
+        
+        // When invoke getCtClass, it will assign all classpath
+        // (like the classloader we added above) to find the target class,
+        // by ClassLoader#getResource, not ClassLoader#loadClass.
+        // It brings one problem: although we have add probe-spy.jar to the search path
+        // of the BootstrapClassloader, the class file can't be loaded, but the class can be loaded.
+        //
+        // To solve the problem, we use ProbeSpyResourceClassLoader to load probe-spy's class files.
+        addClassLoaderToPool(ProbeStubMain.getProbeSpyResourceClassLoader());
+        
         CtClass ctClass = classPool.getCtClass(SPRING_CONTEXT_CLASS_NAME);
-
+        
         CtMethod ctMethod = ctClass.getMethod("finishRefresh",
             Descriptor.ofMethod(CtClass.voidType, new CtClass[0]));
-
-        // The following line maybe throw an RuntimeException which
-        // could not be throw by the invoker of #transform, so we try to catch any Exception.
+        
         ctMethod.insertAfter(
             "org.luncert.mx1.probe.spy.ProbeSpy.fireEvent(\"EVT_INJECT_SPRING_CONTEXT\", this);");
         
         byteCode = ctClass.toBytecode();
         ctClass.detach();
-      } catch (Exception e) {
-        log.error("Failed to transform class {}.", dotSplitClassName, e);
       }
+    } catch (Exception e) {
+      // Some code may throw an RuntimeException which
+      // could will be ignored by the invoker of #transform who is loading classes,
+      // so we try to catch any Exception.
+      log.error("Failed to transform class {}.", dotSplitClassName, e);
     }
     
     return byteCode;

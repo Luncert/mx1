@@ -1,13 +1,11 @@
 package org.luncert.mx1.probe.stub;
 
-import javassist.LoaderClassPath;
 import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.luncert.mx1.probe.stub.exeception.LoadProbeSpyJarError;
 import org.luncert.mx1.probe.stub.component.AgentTransformerFactory;
-import org.luncert.mx1.probe.stub.component.staticInfoCollector.SpringStaticInfoCollector;
 import org.luncert.mx1.probe.stub.exeception.ProbeSpyJarNotFoundError;
 
 import java.io.ByteArrayOutputStream;
@@ -41,8 +39,6 @@ public class ProbeStubMain {
     // If you want to handle loaded classes, too, you have to explicitly retransform these classes.
     inst.addTransformer(transformer, true);
   
-    SpringStaticInfoCollector collector = new SpringStaticInfoCollector();
-    System.out.println(collector.collect());
     //Runtime.getRuntime().addShutdownHook();
   }
   
