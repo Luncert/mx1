@@ -48,10 +48,11 @@ public class ProbeStubMain {
     JarFile spyJarFile = loadProbeSpyJar();
     inst.appendToBootstrapClassLoaderSearch(spyJarFile);
     probeSpyResLoader = new ProbeSpyResourceClassLoader(spyJarFile);
+    
     // register probe event handlers
     // don't create anonymous inner class extend ProbeEventHandler there,
     // If we use ProbeEventHandler, it will be loaded before appendToBootstrapClassLoaderSearch
-    ProbeEventHandlerContainer.register();
+    ProbeEventHandlerManager.register("org.luncert.mx1.probe.stub.component.probeEventHandler");
   }
   
   private static JarFile loadProbeSpyJar() {
