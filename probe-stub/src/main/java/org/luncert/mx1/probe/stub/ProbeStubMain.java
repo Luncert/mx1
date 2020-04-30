@@ -1,5 +1,7 @@
 package org.luncert.mx1.probe.stub;
 
+import javassist.LoaderClassPath;
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -15,7 +17,6 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
-import java.lang.instrument.UnmodifiableClassException;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.util.jar.JarFile;
@@ -27,13 +28,17 @@ public class ProbeStubMain {
   
   private static ProbeSpyResourceClassLoader probeSpyResLoader;
   
-  public static void premain(String agentOptions, Instrumentation inst) throws ClassNotFoundException {
+  public static void premain(String agentOptions, Instrumentation inst) throws NotFoundException {
     log.debug("Probe Stub on.");
   
     setupProbeSpy(inst);
 
-    ClassFileTransformer transformer = AgentTransformerFactory.createTransformer(inst);
-    // FIXME: adding retransformable transformers is not supported in this environment
+    ClassFileTransformer transformer = AgentTransformerFactory.createTransformer();
+  
+    // What does retransform use for?
+    // https://stackoverflow.com/questions/45685245/java-agent-transform-not-invoked-for-all-classes
+    // You are only seeing classes that are not yet loaded when the agent is attached.
+    // If you want to handle loaded classes, too, you have to explicitly retransform these classes.
     inst.addTransformer(transformer, true);
   
     SpringStaticInfoCollector collector = new SpringStaticInfoCollector();

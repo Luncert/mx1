@@ -1,18 +1,20 @@
 package org.luncert.mx1.probe.stub;
 
-import org.luncert.mx1.probe.stub.exeception.LoadProbeSpyResourceError;
+import lombok.extern.slf4j.Slf4j;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.jar.JarFile;
 
+@Slf4j
 class ProbeSpyResourceClassLoader extends ClassLoader {
   
+  private final String spyJarPath;
   private final JarFile spyJar;
   
   ProbeSpyResourceClassLoader(JarFile spyJar) {
     this.spyJar = spyJar;
+    spyJarPath = spyJar.getName().replaceAll("\\\\", "/");
   }
 
   @Override
@@ -21,13 +23,14 @@ class ProbeSpyResourceClassLoader extends ClassLoader {
       return super.findResource(name);
     }
     
-    String spyJarPath = spyJar.getName();
     try {
-      // the ret is like: file://jar-file-path!/class-file-path
-      // I don't know whether 'jar:' is needed
-      return Paths.get(spyJarPath + "!", name).toUri().toURL();
-    } catch (MalformedURLException e) {
-      throw new LoadProbeSpyResourceError(e);
+      // The ret is in such format: jar:file://jar-file-path!/class-file-path
+      // Attention: use '/' not '\' => '!/' is a flag literal to create JarUrlConnection.
+      // See java.net.MalformedURLException
+      return new URL("jar", "", "file:" + spyJarPath + "!/" + name);
+    } catch (IOException e) {
+      log.error("Failed to load probe-spy resource: {}", name, e);
+      return null;
     }
   }
 }

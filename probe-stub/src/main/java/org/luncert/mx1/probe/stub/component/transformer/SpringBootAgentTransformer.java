@@ -1,22 +1,16 @@
 package org.luncert.mx1.probe.stub.component.transformer;
 
-import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.LoaderClassPath;
-import javassist.NotFoundException;
 import javassist.bytecode.Descriptor;
 import lombok.extern.slf4j.Slf4j;
 import org.luncert.mx1.probe.stub.ProbeStubMain;
 import org.luncert.mx1.probe.stub.component.AgentTransformer;
 import org.luncert.mx1.probe.stub.pojo.AppInfo;
 
-import java.io.IOException;
-import java.lang.instrument.IllegalClassFormatException;
-import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.Attributes;
@@ -32,13 +26,10 @@ public class SpringBootAgentTransformer extends AgentTransformer {
   
   private static final String SPRING_CONTEXT_CLASS_NAME =
       "org.springframework.context.support.AbstractApplicationContext";
-  private static final String SPRING_SPY_BEAN_NAME = "SpringSpyBean";
   
   private Set<ClassLoader> classLoaderSet = new HashSet<>();
-  private ClassPool classPool = ClassPool.getDefault();
   
-  private Instrumentation inst;
-  private AppInfo appInfo;
+  private ClassPool classPool = ClassPool.getDefault();
   
   /**
    * mostly refers to spring's JarLauncher
@@ -58,9 +49,7 @@ public class SpringBootAgentTransformer extends AgentTransformer {
   }
   
   @Override
-  public void init(Instrumentation inst, AppInfo appInfo) {
-    this.inst = inst;
-    this.appInfo = appInfo;
+  public void init(AppInfo appInfo) {
     Attributes attrs = appInfo.getManifest().getMainAttributes();
     mainClass = attrs.getValue(MANIFEST_KET_MAIN_CLASS);
     startClass = attrs.getValue(MANIFEST_KEY_START_CLASS);
@@ -70,32 +59,32 @@ public class SpringBootAgentTransformer extends AgentTransformer {
   public byte[] transform(ClassLoader loader, String className,
                           Class<?> classBeingRedefined,
                           ProtectionDomain protectionDomain,
-                          byte[] classfileBuffer) throws IllegalClassFormatException {
-    byte[] byteCode = classfileBuffer;
+                          byte[] classfileBuffer) {
+    byte[] byteCode = null;
     String dotSplitClassName = className.replaceAll("/", ".");
   
-    if (dotSplitClassName.endsWith(startClass)) {
+    if (dotSplitClassName.equals(startClass)) {
       // the start class will be loaded by spring's class loader,
       // it means the start class hasn't been loaded at now, and our
-      // transformer can't transform the start class
-    } else if (dotSplitClassName.endsWith(mainClass)) {
+      // transformer can't createTransformer the start class
+    } else if (dotSplitClassName.equals(mainClass)) {
       addClassLoaderToPool(loader);
   
       try {
         CtClass ctClass = classPool.getCtClass(mainClass);
     
-        CtMethod ctMethod = ctClass.getMethod("main",
-            Descriptor.ofMethod(CtClass.voidType, new CtClass[]{
-                classPool.getCtClass("[Ljava/lang/String")}));
-    
-        ctMethod.insertBefore("System.out.println(\"spy\");");
+        CtMethod ctMethod = ctClass.getMethod("main", "([Ljava/lang/String;)V");
+
+        ctMethod.insertAfter("System.out.println(\"spy\");");
     
         byteCode = ctClass.toBytecode();
         ctClass.detach();
-      } catch (IOException | NotFoundException | CannotCompileException e) {
-        e.printStackTrace();
+      } catch (Exception e) {
+        log.error("Failed to transform class {}.", dotSplitClassName, e);
       }
     } else if (dotSplitClassName.equals(SPRING_CONTEXT_CLASS_NAME)) {
+      // modify spring AbstractApplicationContext
+      
       // add the target class loader to pool
       // ClassPool will entrust it to find target class and probe-spy
       addClassLoaderToPool(loader);
@@ -114,14 +103,16 @@ public class SpringBootAgentTransformer extends AgentTransformer {
 
         CtMethod ctMethod = ctClass.getMethod("finishRefresh",
             Descriptor.ofMethod(CtClass.voidType, new CtClass[0]));
-        
-        ctMethod.insertAfter("System.out.println(\"adadqcacvasda\");" +
+
+        // The following line maybe throw an RuntimeException which
+        // could not be throw by the invoker of #transform, so we try to catch any Exception.
+        ctMethod.insertAfter(
             "org.luncert.mx1.probe.spy.ProbeSpy.fireEvent(\"EVT_INJECT_SPRING_CONTEXT\", this);");
         
         byteCode = ctClass.toBytecode();
-        //ctClass.detach();
-      } catch (IOException | NotFoundException | CannotCompileException e) {
-        e.printStackTrace();
+        ctClass.detach();
+      } catch (Exception e) {
+        log.error("Failed to transform class {}.", dotSplitClassName, e);
       }
     }
     

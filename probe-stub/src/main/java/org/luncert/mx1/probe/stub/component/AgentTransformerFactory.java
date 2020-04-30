@@ -9,10 +9,10 @@ import org.luncert.mx1.probe.stub.pojo.AppStartMode;
 
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -25,17 +25,22 @@ public final class AgentTransformerFactory {
       .add(new SpringBootAgentTransformer())
       .build();
   
-  public static ClassFileTransformer createTransformer(Instrumentation inst) {
+  public static ClassFileTransformer createTransformer() {
     AppInfo appInfo = loadAppInfo();
+  
+    Optional<AgentTransformer> optionalTransformer = AGENT_TRANSFORMERS.stream()
+        .filter(agentTransformer -> agentTransformer.accept(appInfo))
+        .findFirst();
     
-    for (AgentTransformer transformer : AGENT_TRANSFORMERS) {
-      if (transformer.accept(appInfo)) {
-        transformer.init(inst, appInfo);
-        return transformer;
-      }
+    if (!optionalTransformer.isPresent()) {
+      throw new CreateTransformerError("no appropriate transformer, app info: " + appInfo);
     }
     
-    throw new CreateTransformerError("no appropriate transformer, app info: " + appInfo);
+    AgentTransformer transformer = optionalTransformer.get();
+  
+    transformer.init(appInfo);
+    
+    return transformer;
   }
   
   private static AppInfo loadAppInfo() {
