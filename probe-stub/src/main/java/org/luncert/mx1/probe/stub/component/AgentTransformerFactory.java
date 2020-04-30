@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.luncert.mx1.probe.stub.component.transformer.SpringBootAgentTransformer;
 import org.luncert.mx1.probe.stub.exeception.CreateTransformerError;
 import org.luncert.mx1.probe.stub.pojo.AppInfo;
+import org.luncert.mx1.probe.stub.pojo.AppStartMode;
 
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
@@ -23,12 +25,12 @@ public final class AgentTransformerFactory {
       .add(new SpringBootAgentTransformer())
       .build();
   
-  public static ClassFileTransformer createTransformer() {
+  public static ClassFileTransformer createTransformer(Instrumentation inst) {
     AppInfo appInfo = loadAppInfo();
     
     for (AgentTransformer transformer : AGENT_TRANSFORMERS) {
       if (transformer.accept(appInfo)) {
-        transformer.init(appInfo);
+        transformer.init(inst, appInfo);
         return transformer;
       }
     }
@@ -40,7 +42,10 @@ public final class AgentTransformerFactory {
     AppInfo appInfo = new AppInfo();
     
     String classpath = resolveMainClasspath();
+    appInfo.setMainClasspath(classpath);
     if (classpath.endsWith(".jar")) {
+      appInfo.setStartMode(AppStartMode.Jar);
+      
       try {
         JarFile appJar = new JarFile(classpath);
         appInfo.setManifest(appJar.getManifest());

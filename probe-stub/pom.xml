@@ -124,6 +124,21 @@
       <artifactId>fastjson</artifactId>
       <version>1.2.68</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <version>2.2.1.RELEASE</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-loader -->
+<!--    <dependency>-->
+<!--      <groupId>org.springframework.boot</groupId>-->
+<!--      <artifactId>spring-boot-loader</artifactId>-->
+<!--      <version>2.2.6.RELEASE</version>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
   </dependencies>
 
   <build>
@@ -142,6 +157,7 @@
             <manifestEntries>
               <Premain-Class>${main-class}</Premain-Class>
               <Can-Redefine-Classes>true</Can-Redefine-Classes>
+              <Can-Retransform-Classes>true</Can-Retransform-Classes>
             </manifestEntries>
           </archive>
           <descriptorRefs>

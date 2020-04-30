@@ -6,6 +6,10 @@ import java.util.jar.Manifest;
 
 @Data
 public class AppInfo {
+  
+  private AppStartMode startMode;
+  
+  private String mainClasspath;
 
   private Manifest manifest;
 }

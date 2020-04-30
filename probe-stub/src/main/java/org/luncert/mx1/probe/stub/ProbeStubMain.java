@@ -15,8 +15,8 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
 import java.util.jar.JarFile;
 
@@ -25,26 +25,32 @@ public class ProbeStubMain {
   
   private static final String SPY_JAR_NAME = "mx1probe-spy.jar";
   
-  private static final String PROBE_SPY_CLASS = "org.luncert.mx1.probe.spy.ProbeSpy";
+  private static ProbeSpyResourceClassLoader probeSpyResLoader;
   
   public static void premain(String agentOptions, Instrumentation inst) throws ClassNotFoundException {
     log.debug("Probe Stub on.");
   
     setupProbeSpy(inst);
-  
-    ClassFileTransformer transformer = AgentTransformerFactory.createTransformer();
-    inst.addTransformer(transformer);
+
+    ClassFileTransformer transformer = AgentTransformerFactory.createTransformer(inst);
+    // FIXME: adding retransformable transformers is not supported in this environment
+    inst.addTransformer(transformer, true);
   
     SpringStaticInfoCollector collector = new SpringStaticInfoCollector();
     System.out.println(collector.collect());
     //Runtime.getRuntime().addShutdownHook();
   }
   
-  private static void setupProbeSpy(Instrumentation inst) throws ClassNotFoundException {
+  private static void setupProbeSpy(Instrumentation inst) {
     // according to parent delegation model,
     // classes in probe-spy will be loaded by BootstrapClassLoader
-    inst.appendToBootstrapClassLoaderSearch(loadProbeSpyJar());
-    //// TODO: register handlers
+    JarFile spyJarFile = loadProbeSpyJar();
+    inst.appendToBootstrapClassLoaderSearch(spyJarFile);
+    probeSpyResLoader = new ProbeSpyResourceClassLoader(spyJarFile);
+    // register probe event handlers
+    // don't create anonymous inner class extend ProbeEventHandler there,
+    // If we use ProbeEventHandler, it will be loaded before appendToBootstrapClassLoaderSearch
+    ProbeEventHandlerContainer.register();
   }
   
   private static JarFile loadProbeSpyJar() {
@@ -80,5 +86,9 @@ public class ProbeStubMain {
     } catch (IOException e) {
       throw new LoadProbeSpyJarError(e);
     }
+  }
+  
+  public static ClassLoader getProbeSpyResourceClassLoader() {
+    return probeSpyResLoader;
   }
 }
