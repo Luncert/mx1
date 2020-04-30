@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
 public class SpringContextInjectHandler {
   
   @ProbeEventHandler("EVT_INJECT_SPRING_CONTEXT")
-  public static Object handle(Event<ApplicationContext> event) {
+  public static Object injectSpringContext(Event<ApplicationContext> event) {
     ApplicationContext applicationContext = event.getData();
   
     // TODO: analyse app ctx and submit info
@@ -16,5 +16,9 @@ public class SpringContextInjectHandler {
     SpringStaticInfo info = new SpringStaticInfo();
     
     return null;
+  }
+  
+  private static void collect() {
+  
   }
 }

@@ -1,12 +1,12 @@
 package org.luncert.mx1.probe.stub.component.probeEventHandler;
 
 import org.luncert.mx1.probe.spy.Event;
-import org.luncert.mx1.probe.spy.ProbeEventHandler;
+import org.luncert.mx1.probe.stub.annotation.ProbeEventHandler;
 
-public class WriteStdoutHandler extends ProbeEventHandler<String> {
+public class WriteStdoutHandler {
   
-  @Override
-  public Object handle(Event<String> event) {
+  @ProbeEventHandler("EVT_WRITE_STDOUT")
+  public static Object handle(Event<String> event) {
     // TODO: submit to probe-daemon
     return null;
   }

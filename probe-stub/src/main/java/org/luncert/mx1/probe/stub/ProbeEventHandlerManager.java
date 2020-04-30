@@ -31,12 +31,12 @@ import java.util.jar.JarFile;
 
 // https://blog.csdn.net/codalun/article/details/89285757
 @Slf4j
-public class ProbeEventHandlerManager {
+class ProbeEventHandlerManager {
   
   private static final AtomicReference<List<MethodBasedProbeEventHandler>> probeEventHandlersRef
       = new AtomicReference<>();
   
-  public static void register(String packageName) {
+  static void register(String packageName) {
     if (probeEventHandlersRef.get() == null) {
       packageName = packageName.replaceAll("\\.", "/");
       

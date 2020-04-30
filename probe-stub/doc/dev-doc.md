@@ -17,3 +17,4 @@ CustomerReporter：实现ScheduledReporter将metrics发送到CollectorDaemon
 * to get the main class, we have to break the parent delegation model
 * https://blogs.oracle.com/ouchina/javaagent
 * https://speakerdeck.com/shelajev/taming-javaagents-bcn-jug-2015
+* transformer是在要加载某个类时起作用的，如果transform过程中抛出的未捕获的异常是不会被中止程序运行的，有可能是某个地方捕获了然后忽略了。
