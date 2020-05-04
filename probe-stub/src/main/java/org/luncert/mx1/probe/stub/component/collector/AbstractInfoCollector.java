@@ -1,4 +1,4 @@
-package org.luncert.mx1.probe.stub.component;
+package org.luncert.mx1.probe.stub.component.collector;
 
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 

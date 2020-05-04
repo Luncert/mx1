@@ -1,8 +1,8 @@
-package org.luncert.mx1.probe.stub.component.staticInfoCollector;
+package org.luncert.mx1.probe.stub.component.collector.staticinfo;
 
 import org.luncert.mx1.probe.commons.data.staticinfo.JvmStaticInfo;
 import org.luncert.mx1.probe.commons.util.SystemPropertiesUtil;
-import org.luncert.mx1.probe.stub.component.AbstractInfoCollector;
+import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 import java.lang.management.ManagementFactory;

@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.luncert.mx1.probe.commons.data.staticinfo.SystemStaticInfo;
-import org.luncert.mx1.probe.stub.component.staticInfoCollector.SystemStaticInfoCollector;
+import org.luncert.mx1.probe.stub.component.collector.staticinfo.SystemStaticInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 @RunWith(JUnit4.class)
