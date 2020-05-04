@@ -7,7 +7,7 @@ import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 import java.lang.management.ManagementFactory;
 
-public class JvmStaticInfoCollector extends AbstractInfoCollector<JvmStaticInfo> {
+public class StaticJvmInfoCollector extends AbstractInfoCollector<JvmStaticInfo> {
   
   @Override
   public CollectorResponse<JvmStaticInfo> collect() {
@@ -20,6 +20,8 @@ public class JvmStaticInfoCollector extends AbstractInfoCollector<JvmStaticInfo>
     Runtime runtime = Runtime.getRuntime();
     info.setTotalMemory(runtime.totalMemory());
     info.setMaxMemory(runtime.maxMemory());
+  
+    info.setCompilerName(ManagementFactory.getCompilationMXBean().getName());
   
     return CollectorResponse.succeed(info);
   }

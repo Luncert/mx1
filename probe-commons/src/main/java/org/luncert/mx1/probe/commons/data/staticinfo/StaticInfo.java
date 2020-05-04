@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class StaticInfo {
   
-  private SystemStaticInfo systemStaticInfo;
+  private DynamicSystemInfo dynamicSystemInfo;
 
   private JvmStaticInfo jvmStaticInfo;
   

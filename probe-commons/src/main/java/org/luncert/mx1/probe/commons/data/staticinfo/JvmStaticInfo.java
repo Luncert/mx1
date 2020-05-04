@@ -57,4 +57,6 @@ public class JvmStaticInfo {
    * attempt to use, measured in bytes.
    */
   private long maxMemory;
+  
+  private String compilerName;
 }
