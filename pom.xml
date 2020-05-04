@@ -17,6 +17,7 @@
     <module>probe-stub</module>
     <module>probe-commons</module>
     <module>probe-spy</module>
+    <module>probe-ipc</module>
   </modules>
 
   <build>

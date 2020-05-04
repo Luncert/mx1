@@ -4,8 +4,10 @@ import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.luncert.mx1.probe.stub.exeception.LoadProbeSpyJarError;
+import org.luncert.mx1.probe.ipc.IpcChannel;
+import org.luncert.mx1.probe.ipc.IpcFactory;
 import org.luncert.mx1.probe.stub.component.AgentTransformerFactory;
+import org.luncert.mx1.probe.stub.exeception.LoadProbeSpyJarError;
 import org.luncert.mx1.probe.stub.exeception.ProbeSpyJarNotFoundError;
 
 import java.io.ByteArrayOutputStream;
@@ -26,7 +28,8 @@ public class ProbeStubMain {
   
   private static ProbeSpyResourceClassLoader probeSpyResLoader;
   
-  public static void premain(String agentOptions, Instrumentation inst) throws NotFoundException {
+  public static void premain(String agentOptions, Instrumentation inst)
+      throws NotFoundException, IOException {
     log.debug("Probe Stub on.");
   
     setupProbeSpy(inst);
@@ -39,6 +42,10 @@ public class ProbeStubMain {
     // If you want to handle loaded classes, too, you have to explicitly retransform these classes.
     inst.addTransformer(transformer, true);
   
+    // establish ipc connection
+    IpcChannel channel = IpcFactory.udp()
+        
+        .connect();
     //Runtime.getRuntime().addShutdownHook();
   }
   
