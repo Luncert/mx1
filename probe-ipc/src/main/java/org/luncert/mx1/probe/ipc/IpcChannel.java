@@ -3,9 +3,9 @@ package org.luncert.mx1.probe.ipc;
 import java.io.Closeable;
 import java.io.IOException;
 
-public interface IpcChannel extends Closeable {
+public abstract class IpcChannel<E> implements Closeable {
   
-  void write(Object object) throws IOException;
+  public abstract void write(E object) throws IOException;
   
-  default void close() throws IOException {}
+  public void refresh() throws IOException {}
 }

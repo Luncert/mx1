@@ -1,5 +1,6 @@
 package org.luncert.mx1.probe.ipc;
 
+import org.luncert.mx1.probe.ipc.impl.TcpConnector;
 import org.luncert.mx1.probe.ipc.impl.UdpConnector;
 
 public final class IpcFactory {
@@ -10,7 +11,11 @@ public final class IpcFactory {
     throw new UnsupportedOperationException();
   }
   
-  public static UdpConnector udp() {
-    return new UdpConnector();
+  public static <E> UdpConnector<E> udp() {
+    return new UdpConnector<>();
+  }
+  
+  public static <E> TcpConnector<E> tcp() {
+    return new TcpConnector<>();
   }
 }

@@ -12,10 +12,12 @@ import java.io.IOException;
 @RunWith(JUnit4.class)
 public class UdpConnectorTest {
   
+  // FIXME: bug
   @Test
   public void testSuccess() throws IOException, InterruptedException {
     IpcChannel readChannel = IpcFactory.udp()
-        .port(55000)
+        .port(55001)
+        .destination(55000)
         .handler(new IpcDataHandler() {
           @Override
           public void onData(Object data) {
@@ -27,11 +29,12 @@ public class UdpConnectorTest {
     
           }
         })
-        .connect();
+        .open();
     
     IpcChannel writeChannel = IpcFactory.udp()
-        .port(0)
-        .connect();
+        .port(55000)
+        .destination(55001)
+        .open();
     
     writeChannel.write("Test udp message");
     writeChannel.close();

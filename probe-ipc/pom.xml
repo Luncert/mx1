@@ -49,14 +49,14 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
       <version>1.2.3</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.2.3</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -64,6 +64,13 @@
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.esotericsoftware/kryo -->
+    <dependency>
+      <groupId>com.esotericsoftware</groupId>
+      <artifactId>kryo</artifactId>
+      <version>4.0.2</version>
     </dependency>
   </dependencies>
 

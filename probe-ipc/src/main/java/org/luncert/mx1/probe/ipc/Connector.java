@@ -2,7 +2,7 @@ package org.luncert.mx1.probe.ipc;
 
 import java.io.IOException;
 
-public interface Connector {
+public interface Connector<E> {
   
-  IpcChannel connect() throws IOException;
+  IpcChannel open() throws IOException;
 }

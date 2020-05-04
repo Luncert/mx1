@@ -43,9 +43,9 @@ public class ProbeStubMain {
     inst.addTransformer(transformer, true);
   
     // establish ipc connection
-    IpcChannel channel = IpcFactory.udp()
+    IpcChannel channel = IpcFactory.tcp()
         
-        .connect();
+        .open();
     //Runtime.getRuntime().addShutdownHook();
   }
   
