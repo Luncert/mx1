@@ -1,9 +1,9 @@
 package org.luncert.mx1.probe.stub;
 
-import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.luncert.mx1.probe.commons.data.NetURL;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcFactory;
 import org.luncert.mx1.probe.stub.component.AgentTransformerFactory;
@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.util.jar.JarFile;
@@ -29,26 +30,15 @@ public class ProbeStubMain {
   private static ProbeSpyResourceClassLoader probeSpyResLoader;
   
   public static void premain(String agentOptions, Instrumentation inst) {
-    System.out.println(agentOptions);
     log.debug("Probe Stub on.");
+
+    ProbeStubConfig config = ProbeStubConfig.resolveAgentOptions(agentOptions);
   
     setupProbeSpy(inst);
-
-    ClassFileTransformer transformer = AgentTransformerFactory.createTransformer();
-  
-    // What does retransform use for?
-    // https://stackoverflow.com/questions/45685245/java-agent-transform-not-invoked-for-all-classes
-    // You are only seeing classes that are not yet loaded when the agent is attached.
-    // If you want to handle loaded classes, too, you have to explicitly retransform these classes.
-    inst.addTransformer(transformer, true);
-  
-    // establish ipc connection
     
-    //IpcChannel channel = IpcFactory.tcp()
-    //
-    //    .open();
+    addTransformer(inst);
     
-    //Runtime.getRuntime().addShutdownHook();
+    startCollecting(config);
   }
   
   private static void setupProbeSpy(Instrumentation inst) {
@@ -101,5 +91,32 @@ public class ProbeStubMain {
   
   public static ClassLoader getProbeSpyResourceClassLoader() {
     return probeSpyResLoader;
+  }
+  
+  public static void addTransformer(Instrumentation inst) {
+    ClassFileTransformer transformer = AgentTransformerFactory.createTransformer();
+  
+    // What does retransform use for?
+    // https://stackoverflow.com/questions/45685245/java-agent-transform-not-invoked-for-all-classes
+    // You are only seeing classes that are not yet loaded when the agent is attached.
+    // If you want to handle loaded classes, too, you have to explicitly retransform these classes.
+    inst.addTransformer(transformer, true);
+  }
+  
+  public static void startCollecting(ProbeStubConfig config) {
+    // establish ipc connection
+    NetURL daemonUrl = config.getDaemonUrl();
+    assert daemonUrl != null && daemonUrl.getProtocol().equals("tcp");
+    
+    try {
+      IpcChannel channel = IpcFactory.tcp()
+          .destination(new InetSocketAddress(daemonUrl.getHost(), daemonUrl.getPort()))
+          .open();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  
+    // TODO: new thread to do collecting
+    //Runtime.getRuntime().addShutdownHook();
   }
 }
