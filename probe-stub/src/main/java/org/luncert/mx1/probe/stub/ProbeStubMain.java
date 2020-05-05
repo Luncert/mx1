@@ -46,6 +46,7 @@ public class ProbeStubMain {
     IpcChannel channel = IpcFactory.tcp()
         
         .open();
+    
     //Runtime.getRuntime().addShutdownHook();
   }
   

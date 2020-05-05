@@ -12,6 +12,7 @@ import org.luncert.mx1.probe.ipc.IpcDataHandler;
 import org.luncert.mx1.probe.ipc.IpcFactory;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
@@ -22,7 +23,9 @@ public class TcpConnectorTest {
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
-  private static class DataPacket {
+  private static class DataPacket implements Serializable {
+  
+    private static final long serialVersionUID = 2162118160358573673L;
     
     private String action;
     
@@ -31,7 +34,7 @@ public class TcpConnectorTest {
   
   @Test
   public void testSuccess() throws IOException, InterruptedException {
-    SocketAddress serveAddr = new InetSocketAddress("127.0.0.1", 55000);
+    SocketAddress serveAddr = new InetSocketAddress("localhost", 59000);
     
     IpcChannel<DataPacket> readChannel = IpcFactory.<DataPacket>tcp()
         .bind(serveAddr)
@@ -48,19 +51,21 @@ public class TcpConnectorTest {
           }
         })
         .open();
-    
+  
     IpcChannel<DataPacket> writeChannel = IpcFactory.<DataPacket>tcp()
         .destination(serveAddr)
         .open();
+  
     writeChannel.write(DataPacket.builder()
         .action("test action")
         .data("test data")
         .build());
-    writeChannel.close();
+    
+    Thread.sleep(500);
     
     readChannel.refresh();
-    Thread.sleep(1000);
     
+    writeChannel.close();
     readChannel.close();
   }
 }

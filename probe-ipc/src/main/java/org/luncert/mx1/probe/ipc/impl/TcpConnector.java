@@ -5,25 +5,21 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.luncert.mx1.probe.ipc.Connector;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcDataHandler;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,12 +27,10 @@ import java.util.List;
 @Slf4j
 public class TcpConnector<E> implements Connector<E> {
   
-  
-  private EventLoopGroup bossGroup = new NioEventLoopGroup();
+  // single thread for handling establishing of connection
+  private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
   
   private EventLoopGroup workerGroup;
-  
-  private TcpDataHandler nettyDataHandler;
   
   private SocketAddress serveAddr;
   
@@ -44,12 +38,13 @@ public class TcpConnector<E> implements Connector<E> {
   
   private Channel channel;
   
+  private List<IpcDataHandler<E>> handlerList = new LinkedList<>();
+  
   public TcpConnector() {
-    nettyDataHandler = new TcpDataHandler();
   }
   
   public TcpConnector<E> addHandler(IpcDataHandler<E> handler) {
-    nettyDataHandler.addHandler(handler);
+    handlerList.add(handler);
     return this;
   }
   
@@ -79,8 +74,9 @@ public class TcpConnector<E> implements Connector<E> {
         Bootstrap bootstrap = new Bootstrap()
             .group(bossGroup)
             .channel(NioSocketChannel.class)
-            .handler(nettyDataHandler);
-
+            .option(ChannelOption.TCP_NODELAY, true)
+            .handler(new NettyInitializer());
+  
         channelFuture = bootstrap.connect(dest);
       } else if (serveAddr != null) {
         workerGroup = new NioEventLoopGroup();
@@ -88,56 +84,86 @@ public class TcpConnector<E> implements Connector<E> {
         ServerBootstrap bootstrap = new ServerBootstrap()
             .group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel.class)
-            .childHandler(new ChannelInitializer<SocketChannel>() {
-              @Override
-              public void initChannel(SocketChannel ch) {
-                ChannelPipeline pipeline = ch.pipeline();
-                pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-                pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
-                pipeline.addLast(new ObjectEncoder());
-                pipeline.addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
-    
-                pipeline.addLast(nettyDataHandler);
-              }
-            });
+            .option(ChannelOption.SO_BACKLOG,128)
+            .childOption(ChannelOption.SO_KEEPALIVE, true)
+            .childHandler(new NettyInitializer());
         
         channelFuture = bootstrap.bind(serveAddr);
       } else {
         throw new IOException("neither serving address or destination is provided.");
       }
-      
+  
       channel = channelFuture.sync().channel();
+
+      if (channelFuture.isSuccess()) {
+        log.debug("TCP connection opened.");
+      }
       
-      return new TcpOutboundHandler();
+      return new TcpChannel();
     } catch (InterruptedException e) {
       throw new IOException(e);
     }
   }
   
-  private class TcpDataHandler extends SimpleChannelInboundHandler<E> {
-    
-    private List<IpcDataHandler<E>> handlerList = new LinkedList<>();
-    
-    void addHandler(IpcDataHandler<E> handler) {
-      handlerList.add(handler);
+  private class NettyInitializer extends ChannelInitializer<SocketChannel> {
+  
+    @Override
+    public void initChannel(SocketChannel ch) {
+      ch.pipeline()
+          .addLast(MarshallingCodeCFactory.buildMarshallingEncoder()) // outbound handler
+          .addLast(MarshallingCodeCFactory.buildMarshallingDecoder()) // inbound handler
+          .addLast(new TcpDataHandler());
+      // create new TcpDataHandler for each connection
     }
+  }
+  
+  private class TcpDataHandler extends ChannelInboundHandlerAdapter {
     
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, E msg) {
-      System.out.println("???" + msg);
+    @SuppressWarnings("unchecked")
+    public void channelRead(ChannelHandlerContext ctx, Object rawMsg) {
+      
+      E msg = (E) rawMsg;
       for (IpcDataHandler<E> handler : handlerList) {
         handler.onData(msg);
       }
+  
+      ctx.fireChannelRead(rawMsg);
+    }
+    
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+      System.out.println("active");
+      ctx.fireChannelActive();
+    }
+  
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+      System.out.println("inactive");
+      ctx.fireChannelInactive();
+    }
+  
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+      cause.printStackTrace();
+      ctx.fireExceptionCaught(cause);
     }
     
     // TODO: close
   }
   
-  private class TcpOutboundHandler extends IpcChannel<E> {
+  private class TcpChannel extends IpcChannel<E> {
   
     @Override
-    public void write(E object) {
+    public void write(E object) throws IOException {
+      checkObject(object);
       channel.writeAndFlush(object);
+    }
+    
+    private void checkObject(Object obj) throws IOException {
+      if (!(obj instanceof Serializable)) {
+        throw new IOException("object is not serializable");
+      }
     }
     
     @Override
@@ -150,7 +176,7 @@ public class TcpConnector<E> implements Connector<E> {
       try {
         channel.close().sync();
     
-        log.info("TCP connection destroyed.");
+        log.debug("TCP connection closed.");
       } catch (InterruptedException e) {
         throw new IOException(e);
       } finally {
