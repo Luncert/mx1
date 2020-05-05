@@ -39,7 +39,7 @@ class ProbeEventHandlerManager {
   static void register(String packageName) {
     if (probeEventHandlersRef.get() == null) {
       packageName = packageName.replaceAll("\\.", "/");
-      
+
       List<MethodBasedProbeEventHandler> handlers = new ArrayList<>();
       for (Class clazz : scanAllHandlerClasses(packageName)) {
         for (Method method : clazz.getMethods()) {
@@ -78,7 +78,9 @@ class ProbeEventHandlerManager {
           for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements();) {
             JarEntry entry = entries.nextElement();
             String entryName = entry.getName();
-            if (entry.isDirectory() || !entryName.endsWith(".class")) {
+            if (entry.isDirectory() ||
+                !entryName.startsWith(basePackage) ||
+                !entryName.endsWith(".class")) {
               continue;
             }
             
@@ -118,6 +120,16 @@ class ProbeEventHandlerManager {
     return classList;
   }
   
+  private static final FileScanFilter fileScanFilter = new FileScanFilter();
+  
+  private static class FileScanFilter extends AbstractFileFilter {
+  
+    @Override
+    public boolean accept(File file) {
+      return file.isFile() && file.getName().endsWith(".class");
+    }
+  }
+  
   private static void validateHandlerMethod(Method method) {
     Parameter[] parameters = method.getParameters();
     if (parameters.length == 1 && parameters[0].getType().equals(Event.class)) {
@@ -138,7 +150,8 @@ class ProbeEventHandlerManager {
     @Override
     public Object handle(Event event) {
       try {
-        return handlerMethod.invoke(event);
+        // even though the handler method is static, the object arg (null) is needed
+        return handlerMethod.invoke(null, event);
       } catch (IllegalAccessException | InvocationTargetException e) {
         log.error("Failed to invoke handler method {}.", toString(), e);
         return null;

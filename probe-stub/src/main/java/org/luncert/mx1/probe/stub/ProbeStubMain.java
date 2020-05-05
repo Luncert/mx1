@@ -28,8 +28,8 @@ public class ProbeStubMain {
   
   private static ProbeSpyResourceClassLoader probeSpyResLoader;
   
-  public static void premain(String agentOptions, Instrumentation inst)
-      throws NotFoundException, IOException {
+  public static void premain(String agentOptions, Instrumentation inst) {
+    System.out.println(agentOptions);
     log.debug("Probe Stub on.");
   
     setupProbeSpy(inst);
@@ -43,9 +43,10 @@ public class ProbeStubMain {
     inst.addTransformer(transformer, true);
   
     // establish ipc connection
-    IpcChannel channel = IpcFactory.tcp()
-        
-        .open();
+    
+    //IpcChannel channel = IpcFactory.tcp()
+    //
+    //    .open();
     
     //Runtime.getRuntime().addShutdownHook();
   }

@@ -39,10 +39,10 @@ public class TcpConnectorTest {
     IpcChannel<DataPacket> readChannel = IpcFactory.<DataPacket>tcp()
         .bind(serveAddr)
         .addHandler(new IpcDataHandler<DataPacket>() {
-          // TODO: read byte
+
           @Override
           public void onData(DataPacket data) {
-            System.out.println(data);
+            System.out.println("Received: " + data);
           }
   
           @Override

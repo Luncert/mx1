@@ -76,7 +76,7 @@ public final class AgentTransformerFactory {
       return classpathArray[0];
     }
     
-    // filter all agent jar
+    // get all agent jar name
     Set<String> jvmAgentJars = ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
         .filter(arg -> arg.startsWith("-javaagent:"))
         .map(AgentTransformerFactory::getJarFileName)
@@ -107,16 +107,23 @@ public final class AgentTransformerFactory {
     return classpath.substring(lastSplitIdx + 1);
   }
   
+  /**
+   * subtract agent jar file name from java agent params:
+   * e.g. -javaagent:XXX/XXX/agent.jar=arg1=1&arg2=2 -> agent.jar
+   */
   private static String getJarFileName(String jvmAgentArg) {
     char[] charArray = jvmAgentArg.toCharArray();
     int lastSplitIdx = 0, firstEqualIdx = charArray.length;
 
+    // scan to get index of last '\' or '/' and first '='
     for (int i = 0; i < charArray.length; i++) {
       char c = charArray[i];
       if (c == '\\' || c == '/') {
         lastSplitIdx = i;
       } else if (c == '=') {
+        // the first equal is the start flag of agent's parameters
         firstEqualIdx = i;
+        break;
       }
     }
     
