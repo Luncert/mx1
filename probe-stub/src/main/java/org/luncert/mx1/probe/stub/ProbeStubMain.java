@@ -3,10 +3,12 @@ package org.luncert.mx1.probe.stub;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.luncert.mx1.probe.commons.data.IpcPacket;
 import org.luncert.mx1.probe.commons.data.NetURL;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcFactory;
 import org.luncert.mx1.probe.stub.component.AgentTransformerFactory;
+import org.luncert.mx1.probe.stub.component.DaemonConnectionHandler;
 import org.luncert.mx1.probe.stub.exeception.LoadProbeSpyJarError;
 import org.luncert.mx1.probe.stub.exeception.ProbeSpyJarNotFoundError;
 
@@ -109,8 +111,9 @@ public class ProbeStubMain {
     assert daemonUrl != null && daemonUrl.getProtocol().equals("tcp");
     
     try {
-      IpcChannel channel = IpcFactory.tcp()
+      IpcChannel channel = IpcFactory.<IpcPacket>tcp()
           .destination(new InetSocketAddress(daemonUrl.getHost(), daemonUrl.getPort()))
+          .addHandler(new DaemonConnectionHandler())
           .open();
     } catch (IOException e) {
       e.printStackTrace();

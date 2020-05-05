@@ -16,9 +16,7 @@ public class DynamicSystemInfoCollector extends AbstractInfoCollector<DynamicSys
   
   private Sigar sigar;
   
-  // TODO: catch exception
-  @Override
-  protected void init() {
+  public DynamicSystemInfoCollector() {
     // possible exception: no sigar-amd64-winnt.dll in java.library.path
     // see: https://stackoverflow.com/questions/27404471/org-hyperic-sigar-sigarexception-no-sigar-amd64-winnt-dll-in-java-library-path
     sigar = new Sigar();

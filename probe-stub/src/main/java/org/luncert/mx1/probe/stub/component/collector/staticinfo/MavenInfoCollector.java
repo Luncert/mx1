@@ -25,7 +25,7 @@ import java.util.jar.JarFile;
  * jar archive has pom.xml.
  */
 @Slf4j
-public class MavenStaticInfoCollector extends AbstractInfoCollector<MavenStaticInfo> {
+public class MavenInfoCollector extends AbstractInfoCollector<MavenStaticInfo> {
   
   private static final String MAVEN_PATH_IN_JAR = "META-INF/maven/";
   
