@@ -34,7 +34,7 @@ public class ProbeStubMain {
   private static final String SPY_JAR_NAME = "mx1probe-spy.jar";
   
   @Getter
-  private static ProbeSpyResourceClassLoader probeSpyResLoader;
+  private static ProbeSpyResourceClassLoader probeSpyResourceClassLoader;
   
   private static IpcChannel ipcChannel;
   
@@ -59,7 +59,7 @@ public class ProbeStubMain {
     // classes in probe-spy will be loaded by BootstrapClassLoader
     JarFile spyJarFile = loadProbeSpyJar();
     inst.appendToBootstrapClassLoaderSearch(spyJarFile);
-    probeSpyResLoader = new ProbeSpyResourceClassLoader(spyJarFile);
+    probeSpyResourceClassLoader = new ProbeSpyResourceClassLoader(spyJarFile);
     
     // register probe event handlers
     // don't create anonymous inner class extend ProbeEventHandler there,
