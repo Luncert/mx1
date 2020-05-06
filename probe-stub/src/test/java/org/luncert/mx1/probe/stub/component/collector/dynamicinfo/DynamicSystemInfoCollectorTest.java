@@ -13,7 +13,6 @@ public class DynamicSystemInfoCollectorTest {
   @Test
   public void testSuccess() {
     DynamicSystemInfoCollector collector = new DynamicSystemInfoCollector();
-    collector.init();
   
     CollectorResponse<DynamicSystemInfo> rep = collector.collect();
     Assert.assertTrue(rep.getDescription(), rep.isSuccess());

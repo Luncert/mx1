@@ -1,8 +1,8 @@
 package org.luncert.mx1.probe.commons.util;
 
-public final class DoubleUtil {
+public final class DoubleUtils {
   
-  private DoubleUtil() {}
+  private DoubleUtils() {}
   
   /**
    * parse 0.3012(30.12%) to 3012

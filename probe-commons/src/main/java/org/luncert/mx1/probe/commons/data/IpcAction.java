@@ -5,4 +5,6 @@ public final class IpcAction {
   public static final String COLLECT_INFO = "collect info";
   
   public static final String COLLECTOR_REP = "collector response";
+  
+  public static final String COMMIT_INFO = "commit info";
 }

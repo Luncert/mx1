@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.luncert.mx1.probe.commons.data.staticinfo.MavenPomInfo;
 import org.luncert.mx1.probe.commons.data.staticinfo.MavenStaticInfo;
+import org.luncert.mx1.probe.stub.common.ClasspathUtil;
 import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.exeception.LoadMavenPomError;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
@@ -39,7 +40,7 @@ public class MavenInfoCollector extends AbstractInfoCollector<MavenStaticInfo> {
   }
   
   private List<MavenPomInfo> loadPoms() {
-    String classpath = ManagementFactory.getRuntimeMXBean().getClassPath();
+    String classpath = ClasspathUtil.resolveMainClasspath();
     if (classpath.endsWith(".jar")) {
       try {
         List<MavenPomInfo> infoList = new ArrayList<>();

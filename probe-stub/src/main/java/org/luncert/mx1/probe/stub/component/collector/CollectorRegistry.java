@@ -119,8 +119,7 @@ public class CollectorRegistry {
     
     CollectorResponse invokeCollect() {
       try {
-        Method method = collectorType.getMethod("collect");
-        return (CollectorResponse) method.invoke(instance);
+        return instance.collect();
       } catch (Exception e) {
         invokeFailureCount++;
         if (invokeFailureCount == MAX_FAILURE_TIME) {

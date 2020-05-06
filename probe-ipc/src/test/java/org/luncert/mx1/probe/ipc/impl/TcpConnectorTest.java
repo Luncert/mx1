@@ -36,12 +36,12 @@ public class TcpConnectorTest {
   public void testSuccess() throws IOException, InterruptedException {
     SocketAddress serveAddr = new InetSocketAddress("localhost", 59000);
     
-    IpcChannel<DataPacket> readChannel = IpcFactory.<DataPacket>tcp()
+    IpcChannel readChannel = IpcFactory.<DataPacket>tcp()
         .bind(serveAddr)
         .addHandler(new IpcDataHandler<DataPacket>() {
 
           @Override
-          public void onData(DataPacket data) {
+          public void onData(IpcChannel channel, DataPacket data) {
             System.out.println("Received: " + data);
           }
   
@@ -52,7 +52,7 @@ public class TcpConnectorTest {
         })
         .open();
   
-    IpcChannel<DataPacket> writeChannel = IpcFactory.<DataPacket>tcp()
+    IpcChannel writeChannel = IpcFactory.<DataPacket>tcp()
         .destination(serveAddr)
         .open();
   

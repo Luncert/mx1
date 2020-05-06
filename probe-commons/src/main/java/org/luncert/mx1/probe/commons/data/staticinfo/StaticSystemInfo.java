@@ -12,7 +12,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DynamicSystemInfo {
+public class StaticSystemInfo {
   
   @SystemProperty("os.name")
   private String osName;

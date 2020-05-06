@@ -9,7 +9,6 @@ import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 import java.io.IOException;
 
-@Deprecated
 public class DaemonConnectionHandler implements IpcDataHandler<IpcPacket> {
   
   private CollectorRegistry collectorRegistry;
@@ -18,6 +17,7 @@ public class DaemonConnectionHandler implements IpcDataHandler<IpcPacket> {
     this.collectorRegistry = collectorRegistry;
   }
   
+  // The following processing is running in netty worker group.
   @Override
   public void onData(IpcChannel channel, IpcPacket data) throws IOException {
     if (IpcAction.COLLECT_INFO.equals(data.getAction())) {

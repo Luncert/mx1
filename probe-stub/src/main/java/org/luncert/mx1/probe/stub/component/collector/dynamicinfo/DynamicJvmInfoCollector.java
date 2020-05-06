@@ -2,7 +2,7 @@ package org.luncert.mx1.probe.stub.component.collector.dynamicinfo;
 
 import org.luncert.mx1.probe.commons.data.dynamicinfo.DynamicJvmInfo;
 import org.luncert.mx1.probe.commons.data.dynamicinfo.GarbageCollectorInfo;
-import org.luncert.mx1.probe.commons.util.DoubleUtil;
+import org.luncert.mx1.probe.commons.util.DoubleUtils;
 import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
@@ -44,7 +44,7 @@ public class DynamicJvmInfoCollector extends AbstractInfoCollector<DynamicJvmInf
     MemoryUsage heapMemUsage = memMXBean.getHeapMemoryUsage();
     info.setMaxHeapMemory(heapMemUsage.getMax());
     if (info.getMaxHeapMemory() > 0) {
-      info.setHeapMemoryUsage(DoubleUtil.percentToShort(
+      info.setHeapMemoryUsage(DoubleUtils.percentToShort(
           ((double) heapMemUsage.getUsed()) / info.getMaxHeapMemory()));
     } else {
       info.setHeapMemoryUsage((short) -1);
@@ -53,7 +53,7 @@ public class DynamicJvmInfoCollector extends AbstractInfoCollector<DynamicJvmInf
     MemoryUsage nonHeapMemUsage = memMXBean.getNonHeapMemoryUsage();
     info.setMaxNonHeapMemory(nonHeapMemUsage.getMax());
     if (info.getMaxNonHeapMemory() > 0) {
-      info.setNonHeapMemoryUsage(DoubleUtil.percentToShort(
+      info.setNonHeapMemoryUsage(DoubleUtils.percentToShort(
           ((double) nonHeapMemUsage.getUsed()) / info.getMaxNonHeapMemory()));
     } else {
       info.setNonHeapMemoryUsage((short) -1);

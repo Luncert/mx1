@@ -1,14 +1,18 @@
 package org.luncert.mx1.probe.stub;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.luncert.mx1.probe.commons.data.IpcPacket;
 import org.luncert.mx1.probe.commons.data.NetURL;
+import org.luncert.mx1.probe.commons.util.Invokable;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcFactory;
 import org.luncert.mx1.probe.stub.component.AgentTransformerFactory;
+import org.luncert.mx1.probe.stub.component.DaemonConnectionHandler;
 import org.luncert.mx1.probe.stub.component.collector.CollectorRegistry;
+import org.luncert.mx1.probe.stub.component.collector.CollectorScheduler;
 import org.luncert.mx1.probe.stub.exeception.LoadProbeSpyJarError;
 import org.luncert.mx1.probe.stub.exeception.ProbeSpyJarNotFoundError;
 
@@ -29,7 +33,12 @@ public class ProbeStubMain {
   
   private static final String SPY_JAR_NAME = "mx1probe-spy.jar";
   
+  @Getter
   private static ProbeSpyResourceClassLoader probeSpyResLoader;
+  
+  private static IpcChannel ipcChannel;
+  
+  private static CollectorScheduler collectorScheduler;
   
   public static void premain(String agentOptions, Instrumentation inst) {
     log.debug("Probe Stub on.");
@@ -41,6 +50,8 @@ public class ProbeStubMain {
     addTransformer(inst);
     
     startCollecting(config);
+    
+    addShutdownHook();
   }
   
   private static void setupProbeSpy(Instrumentation inst) {
@@ -91,10 +102,6 @@ public class ProbeStubMain {
     }
   }
   
-  public static ClassLoader getProbeSpyResourceClassLoader() {
-    return probeSpyResLoader;
-  }
-  
   private static void addTransformer(Instrumentation inst) {
     ClassFileTransformer transformer = AgentTransformerFactory.createTransformer();
   
@@ -108,23 +115,38 @@ public class ProbeStubMain {
   private static void startCollecting(ProbeStubConfig config) {
     CollectorRegistry collectorRegistry = new CollectorRegistry();
     
-    // start http server to transform static info
-    
-    // establish ipc connection to transform dynamic info
+    // establish ipc connection
     NetURL daemonUrl = config.getDaemonUrl();
     assert daemonUrl != null && daemonUrl.getProtocol().equals("tcp");
     
     try {
-      IpcChannel channel = IpcFactory.<IpcPacket>tcp()
+      ipcChannel = IpcFactory.<IpcPacket>tcp()
           .destination(new InetSocketAddress(daemonUrl.getHost(), daemonUrl.getPort()))
+          .addHandler(new DaemonConnectionHandler(collectorRegistry))
           .open();
-      
-      // TODO: create scheduled collect task
+  
+      collectorScheduler = new CollectorScheduler(collectorRegistry, ipcChannel);
+      collectorScheduler.start();
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("Failed to start collecting.", e);
+    }
+  }
+  
+  private static void addShutdownHook() {
+    Invokable collectorSchedulerHook = new Invokable();
+    collectorSchedulerHook.bind(collectorScheduler).stop();
+  
+    Invokable ipcChannelHook = new Invokable();
+    try {
+      ipcChannelHook.bind(ipcChannel).close();
+    } catch (IOException e) {
+      // ignore
     }
   
-    // TODO: new thread to do collecting
-    //Runtime.getRuntime().addShutdownHook();
+    Thread cleanerThread = new Thread(new ProbeStubCleaner()
+        .addShutdownTask(collectorSchedulerHook)
+        .addShutdownTask(ipcChannelHook));
+    cleanerThread.setDaemon(true);
+    Runtime.getRuntime().addShutdownHook(cleanerThread);
   }
 }

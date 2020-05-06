@@ -6,7 +6,7 @@ import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.Swap;
 import org.luncert.mx1.probe.commons.data.dynamicinfo.DynamicSystemInfo;
-import org.luncert.mx1.probe.commons.util.DoubleUtil;
+import org.luncert.mx1.probe.commons.util.DoubleUtils;
 import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
@@ -30,13 +30,13 @@ public class DynamicSystemInfoCollector extends AbstractInfoCollector<DynamicSys
       info.setLoadAverage(ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage());
       
       CpuPerc cpuPerc = sigar.getCpuPerc();
-      info.setCpuUsage(DoubleUtil.percentToShort(cpuPerc.getCombined() * 100));
+      info.setCpuUsage(DoubleUtils.percentToShort(cpuPerc.getCombined() * 100));
       
       Mem mem = sigar.getMem();
-      info.setMemUsage(DoubleUtil.percentToShort(mem.getUsedPercent()));
+      info.setMemUsage(DoubleUtils.percentToShort(mem.getUsedPercent()));
       
       Swap swap = sigar.getSwap();
-      info.setSwapUsage(DoubleUtil.percentToShort(swap.getUsed() / swap.getTotal()));
+      info.setSwapUsage(DoubleUtils.percentToShort(swap.getUsed() / swap.getTotal()));
     } catch (SigarException e) {
       return CollectorResponse.failed(e.getMessage());
     }
