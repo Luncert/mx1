@@ -8,7 +8,7 @@ import org.luncert.mx1.probe.commons.data.NetURL;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcFactory;
 import org.luncert.mx1.probe.stub.component.AgentTransformerFactory;
-import org.luncert.mx1.probe.stub.component.DaemonConnectionHandler;
+import org.luncert.mx1.probe.stub.component.collector.CollectorRegistry;
 import org.luncert.mx1.probe.stub.exeception.LoadProbeSpyJarError;
 import org.luncert.mx1.probe.stub.exeception.ProbeSpyJarNotFoundError;
 
@@ -95,7 +95,7 @@ public class ProbeStubMain {
     return probeSpyResLoader;
   }
   
-  public static void addTransformer(Instrumentation inst) {
+  private static void addTransformer(Instrumentation inst) {
     ClassFileTransformer transformer = AgentTransformerFactory.createTransformer();
   
     // What does retransform use for?
@@ -105,16 +105,21 @@ public class ProbeStubMain {
     inst.addTransformer(transformer, true);
   }
   
-  public static void startCollecting(ProbeStubConfig config) {
-    // establish ipc connection
+  private static void startCollecting(ProbeStubConfig config) {
+    CollectorRegistry collectorRegistry = new CollectorRegistry();
+    
+    // start http server to transform static info
+    
+    // establish ipc connection to transform dynamic info
     NetURL daemonUrl = config.getDaemonUrl();
     assert daemonUrl != null && daemonUrl.getProtocol().equals("tcp");
     
     try {
       IpcChannel channel = IpcFactory.<IpcPacket>tcp()
           .destination(new InetSocketAddress(daemonUrl.getHost(), daemonUrl.getPort()))
-          .addHandler(new DaemonConnectionHandler())
           .open();
+      
+      // TODO: create scheduled collect task
     } catch (IOException e) {
       e.printStackTrace();
     }

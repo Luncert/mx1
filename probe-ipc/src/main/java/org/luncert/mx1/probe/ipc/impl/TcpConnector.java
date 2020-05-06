@@ -38,6 +38,8 @@ public class TcpConnector<E> implements Connector<E> {
   
   private Channel channel;
   
+  private IpcChannel tcpChannel = new TcpChannel();
+  
   private List<IpcDataHandler<E>> handlerList = new LinkedList<>();
   
   public TcpConnector() {
@@ -67,7 +69,7 @@ public class TcpConnector<E> implements Connector<E> {
   }
   
   @Override
-  public IpcChannel<E> open() throws IOException {
+  public IpcChannel open() throws IOException {
     try {
       ChannelFuture channelFuture;
       if (dest != null) {
@@ -99,7 +101,7 @@ public class TcpConnector<E> implements Connector<E> {
         log.debug("TCP connection opened.");
       }
       
-      return new TcpChannel();
+      return tcpChannel;
     } catch (InterruptedException e) {
       throw new IOException(e);
     }
@@ -121,11 +123,11 @@ public class TcpConnector<E> implements Connector<E> {
     
     @Override
     @SuppressWarnings("unchecked")
-    public void channelRead(ChannelHandlerContext ctx, Object rawMsg) {
+    public void channelRead(ChannelHandlerContext ctx, Object rawMsg) throws IOException {
       
       E msg = (E) rawMsg;
       for (IpcDataHandler<E> handler : handlerList) {
-        handler.onData(msg);
+        handler.onData(tcpChannel, msg);
       }
   
       ctx.fireChannelRead(rawMsg);
@@ -152,10 +154,10 @@ public class TcpConnector<E> implements Connector<E> {
     // TODO: close
   }
   
-  private class TcpChannel extends IpcChannel<E> {
+  private class TcpChannel extends IpcChannel {
   
     @Override
-    public void write(E object) throws IOException {
+    public void write(Object object) throws IOException {
       checkObject(object);
       channel.writeAndFlush(object);
     }

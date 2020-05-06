@@ -1,26 +1,31 @@
 package org.luncert.mx1.probe.stub.component;
 
-import com.google.common.collect.ImmutableMap;
+import org.luncert.mx1.probe.commons.data.IpcAction;
 import org.luncert.mx1.probe.commons.data.IpcPacket;
+import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcDataHandler;
-import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
-import org.luncert.mx1.probe.stub.component.collector.staticinfo.MavenInfoCollector;
+import org.luncert.mx1.probe.stub.component.collector.CollectorRegistry;
+import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
-import java.util.Map;
+import java.io.IOException;
 
+@Deprecated
 public class DaemonConnectionHandler implements IpcDataHandler<IpcPacket> {
   
-  private Map<String, AbstractInfoCollector> staticInfoCollectorMap;
+  private CollectorRegistry collectorRegistry;
   
-  public DaemonConnectionHandler() {
-    staticInfoCollectorMap = ImmutableMap.<String, AbstractInfoCollector>builder()
-        .put("COLLECT_MAVEN_INFO", new MavenInfoCollector())
-        .build();
+  public DaemonConnectionHandler(CollectorRegistry collectorRegistry) {
+    this.collectorRegistry = collectorRegistry;
   }
   
   @Override
-  public void onData(IpcPacket data) {
-  
+  public void onData(IpcChannel channel, IpcPacket data) throws IOException {
+    if (IpcAction.COLLECT_INFO.equals(data.getAction())) {
+      // invoke registry
+      String collectorName = (String) data.getData();
+      CollectorResponse rep = collectorRegistry.collect(collectorName);
+      channel.write(new IpcPacket<>(IpcAction.COLLECT_INFO, rep));
+    }
   }
   
   @Override
