@@ -34,22 +34,21 @@ public class ProbeDaemonMain implements Daemon {
     String action = args[0];
     if ("start".equals(action)) {
       ProbeDaemonMain app = new ProbeDaemonMain();
-      app.loadConfig(filteredArgs);
-      app.start();
       
-      Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-        try {
-          app.stop();
-        } catch (IOException e) {
-          log.error("Failed to stop daemon.", e);
-        }
-      }));
+      app.loadConfig(filteredArgs);
+      
+      Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
+      
+      app.start();
       
       // NOTE: daemon won't exit when execution of main has done.
       // ref: https://stackoverflow.com/questions/2614774/what-can-cause-java-to-keep-running-after-system-exit
       // Reason: daemon is blocked by invoking app.stop() -> ipcChannel.close() -> netty.close()
     } else {
-      // NOTE: send exit signal to stop daemon process
+      log.debug("Daemon is required to stop.");
+      
+      // TODO: will apache-daemon kill daemon process after invoke main?
+      // TODO: send SIGKILL to running daemon process
     }
   }
   
@@ -87,18 +86,22 @@ public class ProbeDaemonMain implements Daemon {
         })
         .open();
     
-    log.info("Daemon up.");
+    log.info("Daemon is up.");
+    
+    ipcChannel.sync();
   }
   
   @Override
-  public void stop() throws IOException {
-    ipcChannel.close();
-    
-    log.info("Daemon down.");
+  public void stop() {
+    try {
+      ipcChannel.close();
+    } catch (IOException e) {
+      log.error("Failed to stop daemon.", e);
+    }
+  
+    log.info("Daemon is down.");
 }
   
   @Override
-  public void destroy() {
-  
-  }
+  public void destroy() {}
 }

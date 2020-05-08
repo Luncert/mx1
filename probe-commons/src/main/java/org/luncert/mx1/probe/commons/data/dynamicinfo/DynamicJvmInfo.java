@@ -26,12 +26,6 @@ public class DynamicJvmInfo implements Serializable {
   private long totalLoadedClassCount;
   
   /**
-   * the total number of classes unloaded since the Java virtual machine
-   * has started execution.
-   */
-  private long unloadedClassCount;
-  
-  /**
    * percent of used heap memory
    */
   private short heapMemoryUsage;

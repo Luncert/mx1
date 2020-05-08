@@ -24,7 +24,6 @@ public class DynamicJvmInfoCollector extends AbstractInfoCollector<DynamicJvmInf
     ClassLoadingMXBean classLoadingMXBean = ManagementFactory.getClassLoadingMXBean();
     info.setLoadedClassCount(classLoadingMXBean.getLoadedClassCount());
     info.setTotalLoadedClassCount(classLoadingMXBean.getTotalLoadedClassCount());
-    info.setUnloadedClassCount(classLoadingMXBean.getUnloadedClassCount());
     
     // get garbage collector info
     List<GarbageCollectorInfo> garbageInfoList = new LinkedList<>();

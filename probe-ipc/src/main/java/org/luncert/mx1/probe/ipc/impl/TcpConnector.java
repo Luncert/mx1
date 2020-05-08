@@ -167,22 +167,31 @@ public class TcpConnector<E> implements Connector<E> {
       } catch (InterruptedException e) {
         throw new IOException(e);
       }
-      assert future.isSuccess();
+      
+      if (!future.isSuccess()) {
+        throw new IOException("failed to write object");
+      }
     }
     
     @Override
-    public void close() throws IOException {
+    public void sync() throws IOException {
       try {
-        channel.close().sync();
+        // channel.close doesn't mean to close the tcp server,
+        // but just request to close this channel and block current thread,
+        // the channelFuture will be notified once the server is down
+        channel.closeFuture().sync();
     
         log.debug("TCP connection closed.");
       } catch (InterruptedException e) {
         throw new IOException(e);
-      } finally {
-        if (workerGroup != null) {
-          workerGroup.shutdownGracefully();
-        }
-        bossGroup.shutdownGracefully();
+      }
+    }
+    
+    @Override
+    public void close() {
+      bossGroup.shutdownGracefully();
+      if (workerGroup != null) {
+        workerGroup.shutdownGracefully();
       }
     }
   }
