@@ -1,0 +1,33 @@
+package org.luncert.mx1.commons.data.staticinfo;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.luncert.mx1.commons.annotation.SystemProperty;
+
+import java.io.Serializable;
+import java.util.Map;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class StaticSystemInfo implements Serializable {
+  
+  private static final long serialVersionUID = 2804806884681106916L;
+  
+  @SystemProperty("os.name")
+  private String osName;
+  
+  @SystemProperty("os.arch")
+  private String osArch;
+  
+  @SystemProperty("os.version")
+  private String osVersion;
+  
+  /**
+   * 系统环境变量
+   */
+  private Map<String, String> env;
+}

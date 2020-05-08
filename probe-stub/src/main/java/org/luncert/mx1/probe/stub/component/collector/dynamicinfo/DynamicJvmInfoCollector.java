@@ -1,8 +1,8 @@
 package org.luncert.mx1.probe.stub.component.collector.dynamicinfo;
 
-import org.luncert.mx1.probe.commons.data.dynamicinfo.DynamicJvmInfo;
-import org.luncert.mx1.probe.commons.data.dynamicinfo.GarbageCollectorInfo;
-import org.luncert.mx1.probe.commons.util.DoubleUtils;
+import org.luncert.mx1.commons.data.dynamicinfo.DynamicJvmInfo;
+import org.luncert.mx1.commons.data.dynamicinfo.GarbageCollectorInfo;
+import org.luncert.mx1.commons.util.DoubleUtils;
 import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 

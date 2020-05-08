@@ -4,10 +4,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.luncert.mx1.probe.commons.data.IpcAction;
-import org.luncert.mx1.probe.commons.data.IpcPacket;
+import org.luncert.mx1.commons.data.IpcAction;
+import org.luncert.mx1.commons.data.IpcPacket;
 
-import org.luncert.mx1.probe.commons.data.staticinfo.StaticSystemInfo;
+import org.luncert.mx1.commons.data.staticinfo.StaticSystemInfo;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.stub.component.collector.CollectorRegistry;
 import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticSystemInfoCollector;

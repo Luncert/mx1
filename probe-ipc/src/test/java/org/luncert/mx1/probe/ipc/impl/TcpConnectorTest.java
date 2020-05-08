@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.luncert.mx1.probe.commons.data.IpcPacket;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcDataHandler;
 import org.luncert.mx1.probe.ipc.IpcFactory;

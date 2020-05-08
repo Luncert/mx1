@@ -1,6 +1,6 @@
 package org.luncert.mx1.probe.stub.component.probeEventHandler;
 
-import org.luncert.mx1.probe.commons.data.staticinfo.SpringStaticInfo;
+import org.luncert.mx1.commons.data.staticinfo.SpringStaticInfo;
 import org.luncert.mx1.probe.spy.Event;
 import org.luncert.mx1.probe.stub.annotation.ProbeEventHandler;
 

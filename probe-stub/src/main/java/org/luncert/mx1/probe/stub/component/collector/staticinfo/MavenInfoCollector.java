@@ -2,8 +2,8 @@ package org.luncert.mx1.probe.stub.component.collector.staticinfo;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.luncert.mx1.probe.commons.data.staticinfo.MavenPomInfo;
-import org.luncert.mx1.probe.commons.data.staticinfo.MavenStaticInfo;
+import org.luncert.mx1.commons.data.staticinfo.MavenPomInfo;
+import org.luncert.mx1.commons.data.staticinfo.MavenStaticInfo;
 import org.luncert.mx1.probe.stub.common.ClasspathUtil;
 import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.exeception.LoadMavenPomError;
@@ -11,7 +11,6 @@ import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;

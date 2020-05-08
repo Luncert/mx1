@@ -10,7 +10,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.AnsiConsole;
-import org.luncert.mx1.probe.commons.data.NetURL;
+import org.luncert.mx1.commons.data.NetURL;
 import org.luncert.mx1.probe.daemon.pojo.Config;
 
 import java.util.List;

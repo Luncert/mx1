@@ -1,8 +1,8 @@
 package org.luncert.mx1.probe.stub.component;
 
-import org.luncert.mx1.probe.commons.data.IpcAction;
-import org.luncert.mx1.probe.commons.data.IpcPacket;
-import org.luncert.mx1.probe.commons.util.PropertiesUtils;
+import org.luncert.mx1.commons.data.IpcAction;
+import org.luncert.mx1.commons.data.IpcPacket;
+import org.luncert.mx1.commons.util.PropertiesUtils;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcDataHandler;
 import org.luncert.mx1.probe.stub.component.collector.CollectorRegistry;

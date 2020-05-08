@@ -2,7 +2,7 @@ package org.luncert.mx1.probe.stub;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.luncert.mx1.probe.commons.data.NetURL;
+import org.luncert.mx1.commons.data.NetURL;
 import org.luncert.mx1.probe.stub.exeception.AgentOptionMissingError;
 
 import java.util.HashMap;

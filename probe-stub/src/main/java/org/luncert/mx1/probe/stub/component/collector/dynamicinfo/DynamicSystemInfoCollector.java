@@ -5,8 +5,8 @@ import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.Swap;
-import org.luncert.mx1.probe.commons.data.dynamicinfo.DynamicSystemInfo;
-import org.luncert.mx1.probe.commons.util.DoubleUtils;
+import org.luncert.mx1.commons.data.dynamicinfo.DynamicSystemInfo;
+import org.luncert.mx1.commons.util.DoubleUtils;
 import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 

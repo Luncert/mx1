@@ -13,11 +13,10 @@
 
   <modules>
     <module>ui</module>
-    <module>server</module>
-    <!-- build probe-daemon at first -->
+    <module>commons</module>
+    <module>core</module>
     <module>probe-daemon</module>
     <module>probe-stub</module>
-    <module>probe-commons</module>
     <module>probe-spy</module>
     <module>probe-ipc</module>
   </modules>
