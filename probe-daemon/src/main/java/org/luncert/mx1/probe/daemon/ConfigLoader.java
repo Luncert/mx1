@@ -10,11 +10,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.AnsiConsole;
+import org.luncert.mx1.probe.commons.data.NetURL;
 import org.luncert.mx1.probe.daemon.pojo.Config;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -30,8 +28,8 @@ class ConfigLoader {
       .add(Option.builder("s").longOpt("server")
           .desc("address of central server").hasArg(true)
           .build())
-      .add(Option.builder("c").longOpt("config")
-          .desc("config file path").hasArg(true)
+      .add(Option.builder("b").longOpt("bind")
+          .desc("serving address of daemon").hasArg(true)
           .build())
       .add(Option.builder("noBanner").longOpt("noBanner")
           .desc("do not print banner").hasArg(false)
@@ -47,26 +45,26 @@ class ConfigLoader {
         printUsage();
         System.exit(0);
       }
-      Config config;
-      if (cmd.hasOption("c")) {
-        config = ConfigLoader.load(new File(cmd.getOptionValue("c")));
-      } else {
-        config = new Config();
-      }
       
+      Config config = new Config();
+      
+      // central server
       if (cmd.hasOption("s")) {
-        if (config.getCentralServer() != null) {
-          log.warn("config file field was overwritten by cmd args: centralServer");
-        }
         config.setCentralServer(cmd.getOptionValue("s"));
       }
       
+      // binding
+      if (cmd.hasOption("b")) {
+        config.setServeAddress(new NetURL(cmd.getOptionValue("b")));
+      }
+      
+      // banner
       if (cmd.hasOption("noBanner")) {
         config.setNoBanner(true);
       }
       
       return config;
-    } catch (ParseException | IOException e) {
+    } catch (ParseException e) {
       printParseError(e);
     }
     return null;
@@ -114,19 +112,5 @@ class ConfigLoader {
     AnsiConsole.systemInstall();
     System.out.println(ansi().fgBrightRed().a(e.getMessage()).reset());
     AnsiConsole.systemUninstall();
-  }
-  
-  static Config load(File file) throws IOException {
-    throw new UnsupportedOperationException();
-    //Config config = new Config();
-    //
-    //Yaml yaml = new Yaml();
-    //Map<String, String> configMap = yaml.load(new FileInputStream(file));
-    //
-    //return config;
-  }
-  
-  static Config load(URL url) {
-    return null;
   }
 }

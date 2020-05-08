@@ -1,6 +1,10 @@
 package org.luncert.mx1.probe.commons.data;
 
-public final class IpcAction {
+import java.io.Serializable;
+
+public final class IpcAction implements Serializable {
+  
+  private static final long serialVersionUID = -1866771129601351080L;
   
   public static final String COLLECT_INFO = "collect info";
   

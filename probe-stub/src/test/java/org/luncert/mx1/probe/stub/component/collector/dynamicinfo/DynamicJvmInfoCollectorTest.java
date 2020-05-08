@@ -15,5 +15,6 @@ public class DynamicJvmInfoCollectorTest {
     DynamicJvmInfoCollector collector = new DynamicJvmInfoCollector();
     CollectorResponse<DynamicJvmInfo> rep = collector.collect();
     Assert.assertTrue(rep.getDescription(), rep.isSuccess());
+    System.out.println(rep.getInfo());
   }
 }

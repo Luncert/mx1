@@ -17,7 +17,7 @@ public class DynamicSystemInfoCollector extends AbstractInfoCollector<DynamicSys
   private Sigar sigar;
   
   public DynamicSystemInfoCollector() {
-    // possible exception: no sigar-amd64-winnt.dll in java.library.path
+    // NOTE: possible exception: no sigar-amd64-winnt.dll in java.library.path
     // see: https://stackoverflow.com/questions/27404471/org-hyperic-sigar-sigarexception-no-sigar-amd64-winnt-dll-in-java-library-path
     sigar = new Sigar();
   }
@@ -27,13 +27,14 @@ public class DynamicSystemInfoCollector extends AbstractInfoCollector<DynamicSys
     DynamicSystemInfo info = new DynamicSystemInfo();
   
     try {
+      // negative means unavailable
       info.setLoadAverage(ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage());
       
       CpuPerc cpuPerc = sigar.getCpuPerc();
-      info.setCpuUsage(DoubleUtils.percentToShort(cpuPerc.getCombined() * 100));
+      info.setCpuUsage(DoubleUtils.percentToShort(cpuPerc.getCombined()));
       
       Mem mem = sigar.getMem();
-      info.setMemUsage(DoubleUtils.percentToShort(mem.getUsedPercent()));
+      info.setMemUsage(DoubleUtils.percentToShort(mem.getUsedPercent() / 100));
       
       Swap swap = sigar.getSwap();
       info.setSwapUsage(DoubleUtils.percentToShort(swap.getUsed() / swap.getTotal()));

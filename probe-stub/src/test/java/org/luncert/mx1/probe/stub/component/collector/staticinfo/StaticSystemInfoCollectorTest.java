@@ -13,7 +13,8 @@ public class StaticSystemInfoCollectorTest {
   @Test
   public void test() {
     StaticSystemInfoCollector collector = new StaticSystemInfoCollector();
-    CollectorResponse<StaticSystemInfo> response = collector.collect();
-    Assert.assertTrue(response.getDescription(), response.isSuccess());
+    CollectorResponse<StaticSystemInfo> rep = collector.collect();
+    Assert.assertTrue(rep.isSuccess());
+    System.out.println(rep.getInfo());
   }
 }

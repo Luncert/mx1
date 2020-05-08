@@ -91,9 +91,15 @@ public class CollectorRegistry {
     if (!info.getState().equals(CollectorState.AVAILABLE)) {
       log.warn("Collector {} is {}, cannot to collect.",
           info.getCollectorType(), info.getState().getValue());
+      return null;
     }
     
     return info.invokeCollect();
+  }
+  
+  public CollectorState getCollectorState(String collectorName) {
+    CollectorInfo info = collectorIndex.get(collectorName);
+    return info == null ? null : info.getState();
   }
   
   private static class CollectorInfo {

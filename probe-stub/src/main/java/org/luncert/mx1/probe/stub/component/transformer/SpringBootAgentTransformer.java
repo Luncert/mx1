@@ -92,7 +92,7 @@ public class SpringBootAgentTransformer extends AgentTransformer {
         // ClassPool will entrust it to find target class and probe-spy
         addClassLoaderToPool(loader);
         
-        // When invoke getCtClass, it will assign all classpath
+        // When invoke getCtClass, it will invoke all LoaderClasspath
         // (like the classloader we added above) to find the target class,
         // by ClassLoader#getResource, not ClassLoader#loadClass.
         // It brings one problem: although we have add probe-spy.jar to the search path

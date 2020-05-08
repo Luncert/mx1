@@ -13,6 +13,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.luncert.mx1.probe.ipc.Connector;
 import org.luncert.mx1.probe.ipc.IpcChannel;
@@ -88,6 +90,7 @@ public class TcpConnector<E> implements Connector<E> {
             .channel(NioServerSocketChannel.class)
             .option(ChannelOption.SO_BACKLOG,128)
             .childOption(ChannelOption.SO_KEEPALIVE, true)
+            .handler(new LoggingHandler(LogLevel.INFO))
             .childHandler(new NettyInitializer());
         
         channelFuture = bootstrap.bind(serveAddr);
@@ -125,6 +128,7 @@ public class TcpConnector<E> implements Connector<E> {
     @SuppressWarnings("unchecked")
     public void channelRead(ChannelHandlerContext ctx, Object rawMsg) throws IOException {
       
+      System.out.println(rawMsg);
       E msg = (E) rawMsg;
       for (IpcDataHandler<E> handler : handlerList) {
         handler.onData(tcpChannel, msg);
@@ -135,42 +139,35 @@ public class TcpConnector<E> implements Connector<E> {
     
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-      System.out.println("active");
       ctx.fireChannelActive();
     }
   
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-      System.out.println("inactive");
       ctx.fireChannelInactive();
     }
   
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-      cause.printStackTrace();
+      // NOTE: If remote is closed when server is reading data, it will throw following exception:
+      // An existing connection was forcibly closed by the remote host.
       ctx.fireExceptionCaught(cause);
     }
-    
-    // TODO: close
   }
   
   private class TcpChannel extends IpcChannel {
   
     @Override
-    public void write(Object object) throws IOException {
-      checkObject(object);
-      channel.writeAndFlush(object);
-    }
-    
-    private void checkObject(Object obj) throws IOException {
-      if (!(obj instanceof Serializable)) {
-        throw new IOException("object is not serializable");
+    public synchronized void write(Object object) throws IOException {
+      // NOTE: check whether obj and its fields are all serializable
+      ChannelFuture future = channel.writeAndFlush(object);
+      
+      try {
+        future.sync();
+      } catch (InterruptedException e) {
+        throw new IOException(e);
       }
-    }
-    
-    @Override
-    public void refresh() {
-      channel.read();
+      assert future.isSuccess();
     }
     
     @Override

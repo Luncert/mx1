@@ -27,6 +27,7 @@ public class Invokable {
     this.method = method;
   }
   
+  // FIXME: bytebuddy - Cannot subclass primitive, array or final types
   @SuppressWarnings("unchecked")
   public <T> T bind(T instance) {
     this.instance = instance;

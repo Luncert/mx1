@@ -6,13 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.luncert.mx1.probe.commons.annotation.SystemProperty;
 
+import java.io.Serializable;
 import java.util.Map;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StaticSystemInfo {
+public class StaticSystemInfo implements Serializable {
+  
+  private static final long serialVersionUID = 2804806884681106916L;
   
   @SystemProperty("os.name")
   private String osName;

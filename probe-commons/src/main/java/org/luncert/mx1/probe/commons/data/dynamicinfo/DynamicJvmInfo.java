@@ -2,11 +2,14 @@ package org.luncert.mx1.probe.commons.data.dynamicinfo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 // ref: https://blog.csdn.net/csdnzhangtao5/article/details/72625082
 @Data
-public class DynamicJvmInfo {
+public class DynamicJvmInfo implements Serializable {
+  
+  private static final long serialVersionUID = 3485574832430913043L;
   
   private List<GarbageCollectorInfo> garbageCollectorInfoList;
   

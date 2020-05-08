@@ -5,11 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DynamicSystemInfo {
+public class DynamicSystemInfo implements Serializable {
+  
+  private static final long serialVersionUID = 6280804822223735179L;
   
   /**
    * the system load average for the last minute

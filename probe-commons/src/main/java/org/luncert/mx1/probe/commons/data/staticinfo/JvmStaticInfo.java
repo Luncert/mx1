@@ -6,13 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.luncert.mx1.probe.commons.annotation.SystemProperty;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class JvmStaticInfo {
+public class JvmStaticInfo implements Serializable {
+  
+  private static final long serialVersionUID = 2483572898800018150L;
   
   @SystemProperty("java.version")
   private String javaVersion;

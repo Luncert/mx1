@@ -13,8 +13,8 @@ public class StaticJvmInfoCollectorTest {
   @Test
   public void test() {
     StaticJvmInfoCollector collector = new StaticJvmInfoCollector();
-    CollectorResponse<JvmStaticInfo> response = collector.collect();
-    Assert.assertTrue(response.getDescription(), response.isSuccess());
-    System.out.println(response.getInfo());
+    CollectorResponse<JvmStaticInfo> rep = collector.collect();
+    Assert.assertTrue(rep.isSuccess());
+    System.out.println(rep.getInfo());
   }
 }

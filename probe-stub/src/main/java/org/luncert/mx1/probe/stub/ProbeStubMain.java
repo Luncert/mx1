@@ -6,7 +6,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.luncert.mx1.probe.commons.data.IpcPacket;
 import org.luncert.mx1.probe.commons.data.NetURL;
-import org.luncert.mx1.probe.commons.util.Invokable;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcFactory;
 import org.luncert.mx1.probe.stub.component.AgentTransformerFactory;
@@ -122,30 +121,30 @@ public class ProbeStubMain {
     try {
       ipcChannel = IpcFactory.<IpcPacket>tcp()
           .destination(new InetSocketAddress(daemonUrl.getHost(), daemonUrl.getPort()))
-          .addHandler(new DaemonConnectionHandler(collectorRegistry))
+          //.addHandler(new DaemonConnectionHandler(collectorRegistry))
           .open();
   
       collectorScheduler = new CollectorScheduler(collectorRegistry, ipcChannel);
       collectorScheduler.start();
+      
+      log.debug("CollectorScheduler started.");
     } catch (IOException e) {
       log.error("Failed to start collecting.", e);
     }
   }
   
   private static void addShutdownHook() {
-    Invokable collectorSchedulerHook = new Invokable();
-    collectorSchedulerHook.bind(collectorScheduler).stop();
-  
-    Invokable ipcChannelHook = new Invokable();
-    try {
-      ipcChannelHook.bind(ipcChannel).close();
-    } catch (IOException e) {
-      // ignore
+    ProbeStubCleaner probeStubCleaner = new ProbeStubCleaner();
+    
+    if (collectorScheduler != null) {
+      probeStubCleaner.addShutdownTask(() -> collectorScheduler.stop());
     }
-  
-    Thread cleanerThread = new Thread(new ProbeStubCleaner()
-        .addShutdownTask(collectorSchedulerHook)
-        .addShutdownTask(ipcChannelHook));
+    
+    if (ipcChannel != null) {
+      probeStubCleaner.addShutdownTask(() -> ipcChannel.close());
+    }
+    
+    Thread cleanerThread = new Thread(probeStubCleaner);
     cleanerThread.setDaemon(true);
     Runtime.getRuntime().addShutdownHook(cleanerThread);
   }

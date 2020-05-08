@@ -10,7 +10,7 @@ public class NetURL {
   private static final Pattern PATTERN =
       Pattern.compile("(?<protocol>\\w+)://" +
           "(?<host>[\\w|\\d]+):" +
-          "(?<port>\\d+)/(?<path>.*)");
+          "(?<port>\\d+)(/(?<path>.*))?");
   
   @Getter
   private final String protocol;
@@ -35,5 +35,11 @@ public class NetURL {
     this.host = matcher.group("host");
     this.port = Integer.valueOf(matcher.group("port"));
     this.path = matcher.group("path");
+  }
+  
+  @Override
+  public String toString() {
+    return protocol + "://" + host + ":" + port +
+        (path == null ? "": "/" + path);
   }
 }

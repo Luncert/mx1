@@ -2,8 +2,12 @@ package org.luncert.mx1.probe.commons.data.staticinfo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class StaticInfo {
+public class StaticInfo implements Serializable {
+  
+  private static final long serialVersionUID = -8526362075553567065L;
   
   private StaticSystemInfo dynamicSystemInfo;
 

@@ -3,17 +3,22 @@ package org.luncert.mx1.probe.daemon;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
-import org.apache.commons.daemon.DaemonInitException;
+import org.luncert.mx1.probe.commons.data.IpcPacket;
+import org.luncert.mx1.probe.commons.data.NetURL;
 import org.luncert.mx1.probe.daemon.pojo.Config;
+import org.luncert.mx1.probe.ipc.IpcChannel;
+import org.luncert.mx1.probe.ipc.IpcDataHandler;
+import org.luncert.mx1.probe.ipc.IpcFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 
 @Slf4j
 public class ProbeDaemonMain implements Daemon {
   
   private Config config;
+  
+  private IpcChannel ipcChannel;
   
   /**
    * provide for commons-daemon to invoke
@@ -29,39 +34,68 @@ public class ProbeDaemonMain implements Daemon {
     String action = args[0];
     if ("start".equals(action)) {
       ProbeDaemonMain app = new ProbeDaemonMain();
-      app.init(filteredArgs);
+      app.loadConfig(filteredArgs);
       app.start();
+      
+      Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        try {
+          app.stop();
+        } catch (IOException e) {
+          log.error("Failed to stop daemon.", e);
+        }
+      }));
+      
+      // NOTE: daemon won't exit when execution of main has done.
+      // ref: https://stackoverflow.com/questions/2614774/what-can-cause-java-to-keep-running-after-system-exit
+      // Reason: daemon is blocked by invoking app.stop() -> ipcChannel.close() -> netty.close()
     } else {
-      // TODO: stop
+      // NOTE: send exit signal to stop daemon process
     }
   }
   
   @Override
-  public void init(DaemonContext daemonContext) throws DaemonInitException {
-    init(daemonContext.getArguments());
+  public void init(DaemonContext daemonContext) {
+    loadConfig(daemonContext.getArguments());
   }
   
-  private void init(String[] args) {
+  private void loadConfig(String[] args) {
     config = ConfigLoader.load(args);
   }
   
   @Override
   public void start() throws Exception {
-    log.info("Starting mx1probe-daemon with configuration: {}", config);
+    log.info("Starting daemon with configuration: {}", config);
     
-    if (config.isNoBanner()) {
-      log.info("Probe-daemon on.");
-    } else {
+    if (!config.isNoBanner()) {
       BannerLoader.print("{brightGreen:mx1probe-daemon} by {brightCyan:Luncert}");
     }
   
-    //IStubDataReceiver stubDataReceiver = ;
+    // TODO: connect to central
+    NetURL serveAddress = config.getServeAddress();
+    ipcChannel = IpcFactory.<IpcPacket>tcp()
+        .bind(new InetSocketAddress(serveAddress.getHost(), serveAddress.getPort()))
+        .addHandler(new IpcDataHandler<IpcPacket>() {
+          @Override
+          public void onData(IpcChannel channel, IpcPacket data) {
+            log.info("Received: {}.", data);
+          }
+  
+          @Override
+          public void onClose() {
+    
+          }
+        })
+        .open();
+    
+    log.info("Daemon up.");
   }
   
   @Override
-  public void stop() throws Exception {
-    log.info("Probe-daemon off.");
-  }
+  public void stop() throws IOException {
+    ipcChannel.close();
+    
+    log.info("Daemon down.");
+}
   
   @Override
   public void destroy() {

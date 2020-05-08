@@ -14,6 +14,7 @@ import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticSystemInf
 import org.mockito.Mockito;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import static org.mockito.Matchers.any;
 
@@ -31,7 +32,7 @@ public class DaemonConnectionHandlerTest {
     }).when(channel).write(any());
 
     IpcPacket<String> ipcPacket = new IpcPacket<>(IpcAction.COLLECT_INFO,
-        StaticSystemInfoCollector.class.getName());
+        new Properties(), StaticSystemInfoCollector.class.getName());
     CollectorRegistry registry = new CollectorRegistry();
     DaemonConnectionHandler handler = new DaemonConnectionHandler(registry);
     handler.onData(channel, ipcPacket);
