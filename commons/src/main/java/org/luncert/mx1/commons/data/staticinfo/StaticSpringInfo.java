@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class SpringStaticInfo implements Serializable {
+public class StaticSpringInfo implements Serializable {
   
   private static final long serialVersionUID = 3671697363806015426L;
   

@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class JvmStaticInfo implements Serializable {
+public class StaticJvmInfo implements Serializable {
   
   private static final long serialVersionUID = 2483572898800018150L;
   

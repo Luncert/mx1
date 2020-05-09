@@ -20,7 +20,7 @@ public class UdpConnectorTest {
         .handler(new IpcDataHandler() {
           @Override
           public void onData(IpcChannel channel, Object data) {
-    
+            System.out.println("received: " + data);
           }
   
           @Override

@@ -3,7 +3,7 @@ package org.luncert.mx1.probe.daemon;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
-import org.luncert.mx1.commons.data.IpcPacket;
+import org.luncert.mx1.commons.data.DataPacket;
 import org.luncert.mx1.commons.data.NetURL;
 import org.luncert.mx1.probe.daemon.pojo.Config;
 import org.luncert.mx1.probe.ipc.IpcChannel;
@@ -71,11 +71,11 @@ public class ProbeDaemonMain implements Daemon {
   
     // TODO: connect to central
     NetURL serveAddress = config.getServeAddress();
-    ipcChannel = IpcFactory.<IpcPacket>tcp()
+    ipcChannel = IpcFactory.<DataPacket>tcp()
         .bind(new InetSocketAddress(serveAddress.getHost(), serveAddress.getPort()))
-        .addHandler(new IpcDataHandler<IpcPacket>() {
+        .addHandler(new IpcDataHandler<DataPacket>() {
           @Override
-          public void onData(IpcChannel channel, IpcPacket data) {
+          public void onData(IpcChannel channel, DataPacket data) {
             log.info("Received: {}.", data);
           }
   

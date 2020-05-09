@@ -127,8 +127,6 @@ public class TcpConnector<E> implements Connector<E> {
     @Override
     @SuppressWarnings("unchecked")
     public void channelRead(ChannelHandlerContext ctx, Object rawMsg) throws IOException {
-      
-      System.out.println(rawMsg);
       E msg = (E) rawMsg;
       for (IpcDataHandler<E> handler : handlerList) {
         handler.onData(tcpChannel, msg);
@@ -162,6 +160,8 @@ public class TcpConnector<E> implements Connector<E> {
       // NOTE: check whether obj and its fields are all serializable
       ChannelFuture future = channel.writeAndFlush(object);
       
+      // TODO: figure out the reason why receiver cannot receive data
+      //  if I delete following part.
       try {
         future.sync();
       } catch (InterruptedException e) {

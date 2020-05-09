@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+// FIXME: is it thread-safe to send data through ws?
 @Slf4j
 @Component
 public final class ActionHandlerManager {
@@ -54,7 +55,7 @@ public final class ActionHandlerManager {
   }
   
   /**
-   * find all class with @ActionHandlerRegistry annotation, and build ActionHandler for their handle method.
+   * find all class with @ActionHandlerRegistry annotation, and build ActionHandler for their handleData method.
    */
   private List<AbstractActionHandler> buildHandlerWithRegistry() {
     Collection<Object> handlerRegistryCollection =
@@ -77,7 +78,7 @@ public final class ActionHandlerManager {
   }
   
   /**
-   * verify handle method's signature.
+   * verify handleData method's signature.
    */
   private void verifyMethodSignature(Method method) {
     Parameter[] parameters = method.getParameters();

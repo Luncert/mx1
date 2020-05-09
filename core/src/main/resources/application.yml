@@ -1,9 +1,0 @@
-spring:
-  data:
-    elasticsearch:
-      cluster-nodes: localhost:9300
-      cluster-name: docker-cluster # defined in elasticsearch's image, see: https://blog.csdn.net/u012534326/article/details/99682162
-    mongodb:
-      uri: mongodb://root:root@localhost:27017/database
-mx1:
-  binding: tcp://localhost:43211

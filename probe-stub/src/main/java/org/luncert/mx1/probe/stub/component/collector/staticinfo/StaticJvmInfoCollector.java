@@ -1,17 +1,17 @@
 package org.luncert.mx1.probe.stub.component.collector.staticinfo;
 
-import org.luncert.mx1.commons.data.staticinfo.JvmStaticInfo;
+import org.luncert.mx1.commons.data.staticinfo.StaticJvmInfo;
 import org.luncert.mx1.commons.util.SystemPropertiesUtil;
 import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 import java.lang.management.ManagementFactory;
 
-public class StaticJvmInfoCollector extends AbstractInfoCollector<JvmStaticInfo> {
+public class StaticJvmInfoCollector extends AbstractInfoCollector<StaticJvmInfo> {
   
   @Override
-  public CollectorResponse<JvmStaticInfo> collect() {
-    JvmStaticInfo info = new JvmStaticInfo();
+  public CollectorResponse<StaticJvmInfo> collect() {
+    StaticJvmInfo info = new StaticJvmInfo();
     
     SystemPropertiesUtil.fill(info);
   

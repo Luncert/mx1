@@ -4,10 +4,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.luncert.mx1.commons.data.IpcAction;
-import org.luncert.mx1.commons.data.IpcPacket;
+import org.luncert.mx1.commons.data.DataPacket;
+import org.luncert.mx1.commons.constant.IpcAction;
 
-import org.luncert.mx1.commons.data.staticinfo.StaticSystemInfo;
+import org.luncert.mx1.commons.data.staticinfo.StaticSysInfo;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.stub.component.collector.CollectorRegistry;
 import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticSystemInfoCollector;
@@ -26,15 +26,15 @@ public class DaemonConnectionHandlerTest {
     IpcChannel channel = Mockito.mock(IpcChannel.class);
     
     Mockito.doAnswer(invocationOnMock -> {
-      IpcPacket packet = invocationOnMock.getArgumentAt(0, IpcPacket.class);
-      Assert.assertTrue(packet.getData() instanceof StaticSystemInfo);
+      DataPacket packet = invocationOnMock.getArgumentAt(0, DataPacket.class);
+      Assert.assertTrue(packet.getData() instanceof StaticSysInfo);
       return null;
     }).when(channel).write(any());
 
-    IpcPacket<String> ipcPacket = new IpcPacket<>(IpcAction.COLLECT_INFO,
+    DataPacket<String> dataPacket = new DataPacket<>(IpcAction.COLLECT_INFO,
         new Properties(), StaticSystemInfoCollector.class.getName());
     CollectorRegistry registry = new CollectorRegistry();
     DaemonConnectionHandler handler = new DaemonConnectionHandler(registry);
-    handler.onData(channel, ipcPacket);
+    handler.onData(channel, dataPacket);
   }
 }

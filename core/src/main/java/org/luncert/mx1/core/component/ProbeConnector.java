@@ -40,7 +40,7 @@ public final class ProbeConnector {
   private Map<ChannelHandlerContext, Session> sessionCache = new ConcurrentHashMap<>();
   
   @Autowired
-  private ProbeDataHandler probeDataHandler;
+  private ProbeListener probeListener;
   
   @Value("${mx1.binding}")
   private String binding;
@@ -80,27 +80,41 @@ public final class ProbeConnector {
     channelFuture.sync();
   
     if (channelFuture.isSuccess()) {
-      log.info("ProbeConnector is up, data handler is {}.", probeDataHandler);
+      log.info("ProbeConnector is up, listener is {}.", probeListener);
     }
   }
   
   private class TcpDataHandler extends ChannelInboundHandlerAdapter {
   
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-      sessionCache.computeIfAbsent(ctx, Session::new);
+    public void channelActive(ChannelHandlerContext ctx) {
+      Session session = sessionCache.computeIfAbsent(ctx, Session::new);
+      probeListener.onConnected(session);
+      
       ctx.fireChannelActive();
     }
   
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-      sessionCache.remove(ctx);
-      ctx.fireChannelInactive();
+    @Override
+    @SuppressWarnings("unchecked")
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws IOException {
+      Session session = sessionCache.get(ctx);
+      probeListener.handleData(session, msg);
+      
+      ctx.fireChannelRead(msg);
     }
   
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws IOException {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
       Session session = sessionCache.get(ctx);
-      probeDataHandler.handle(session, msg);
-      ctx.fireChannelRead(msg);
+      probeListener.onException(session, cause);
+      
+      ctx.fireExceptionCaught(cause);
+    }
+  
+    public void channelInactive(ChannelHandlerContext ctx) {
+      Session session = sessionCache.remove(ctx);
+      probeListener.onDisconnected(session);
+      
+      ctx.fireChannelInactive();
     }
   }
   

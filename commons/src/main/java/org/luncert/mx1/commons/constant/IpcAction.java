@@ -1,4 +1,4 @@
-package org.luncert.mx1.commons.data;
+package org.luncert.mx1.commons.constant;
 
 import java.io.Serializable;
 

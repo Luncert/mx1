@@ -15,7 +15,7 @@ class ActionHandlerChain {
   
   void handle(String rawMessage) {
     for (AbstractActionHandler actionHandler : actionHandlerList) {
-      log.debug("handle over to handler {}.", getHandlerName(actionHandler));
+      log.debug("handleData over to handler {}.", getHandlerName(actionHandler));
       actionHandler.handleMessage(rawMessage);
     }
   }

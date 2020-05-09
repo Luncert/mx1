@@ -1,8 +1,11 @@
 package org.luncert.mx1.core.common.constant;
 
-public final class Action {
+/**
+ * web-socket action
+ */
+public final class WsAction {
   
-  private Action() {}
+  private WsAction() {}
 
   public static final String MONITOR_APP_INFO = "monitor app info";
   

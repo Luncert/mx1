@@ -5,8 +5,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.luncert.mx1.commons.data.IpcAction;
-import org.luncert.mx1.commons.data.IpcPacket;
+import org.luncert.mx1.commons.data.DataPacket;
+import org.luncert.mx1.commons.constant.IpcAction;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
@@ -28,7 +28,7 @@ public class CollectorSchedulerTest {
     
     scheduler.stop();
     
-    // TODO: expect to receive 20 IpcPacket, actually got 6
+    // TODO: expect to receive 20 DataPacket, actually got 6
     System.out.println(ipcChannel.getInfoCount());
   }
   
@@ -40,9 +40,9 @@ public class CollectorSchedulerTest {
     @Override
     @SuppressWarnings("unchecked")
     public void write(Object object) {
-      assert object instanceof IpcPacket;
+      assert object instanceof DataPacket;
       
-      IpcPacket<CollectorResponse> packet = (IpcPacket<CollectorResponse>) object;
+      DataPacket<CollectorResponse> packet = (DataPacket<CollectorResponse>) object;
       Assert.assertEquals(IpcAction.COMMIT_INFO, packet.getAction());
       
       CollectorResponse rep = packet.getData();

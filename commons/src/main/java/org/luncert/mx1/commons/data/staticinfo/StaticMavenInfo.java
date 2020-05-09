@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MavenStaticInfo implements Serializable {
+public class StaticMavenInfo implements Serializable {
   
   private static final long serialVersionUID = 4381007202429917639L;
   

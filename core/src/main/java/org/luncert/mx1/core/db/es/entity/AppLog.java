@@ -9,6 +9,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
 
+// TODO: ref sb-core
 @Data
 @Document(indexName = "app_log", type="java")
 @Builder

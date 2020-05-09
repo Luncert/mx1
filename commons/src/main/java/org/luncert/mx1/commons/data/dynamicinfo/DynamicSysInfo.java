@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DynamicSystemInfo implements Serializable {
+public class DynamicSysInfo implements Serializable {
   
   private static final long serialVersionUID = 6280804822223735179L;
   

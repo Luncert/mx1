@@ -70,11 +70,11 @@ public class TcpConnectorTest {
 
   //@Test
   //public void testSend() throws IOException {
-  //  try (IpcChannel writeChannel = IpcFactory.<IpcPacket>tcp()
+  //  try (IpcChannel writeChannel = IpcFactory.<DataPacket>tcp()
   //      .destination(serveAddr)
   //      .open()) {
   //    for (int i = 0; i < 3; i++) {
-  //      writeChannel.write(new IpcPacket<>("test action", "test data " + i));
+  //      writeChannel.write(new DataPacket<>("test action", "test data " + i));
   //    }
   //  }
   //}

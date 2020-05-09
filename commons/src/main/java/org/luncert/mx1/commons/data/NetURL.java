@@ -24,6 +24,12 @@ public class NetURL {
   @Getter
   private final String path;
   
+  public NetURL(String protocol, String host, int port) {
+    this.protocol = protocol;
+    this.host = host;
+    this.port = port;
+    this.path = null;
+  }
   
   public NetURL(String urlStr) {
     Matcher matcher = PATTERN.matcher(urlStr);

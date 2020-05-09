@@ -3,7 +3,7 @@ package org.luncert.mx1.probe.stub.component.collector.staticinfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.luncert.mx1.commons.data.staticinfo.MavenPomInfo;
-import org.luncert.mx1.commons.data.staticinfo.MavenStaticInfo;
+import org.luncert.mx1.commons.data.staticinfo.StaticMavenInfo;
 import org.luncert.mx1.probe.stub.common.ClasspathUtil;
 import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.exeception.LoadMavenPomError;
@@ -25,15 +25,15 @@ import java.util.jar.JarFile;
  * jar archive has pom.xml.
  */
 @Slf4j
-public class MavenInfoCollector extends AbstractInfoCollector<MavenStaticInfo> {
+public class MavenInfoCollector extends AbstractInfoCollector<StaticMavenInfo> {
   
   private static final String MAVEN_PATH_IN_JAR = "META-INF/maven/";
   
   private static final String POM_NAME = "pom.xml";
   
   @Override
-  public CollectorResponse<MavenStaticInfo> collect() {
-    MavenStaticInfo info = new MavenStaticInfo();
+  public CollectorResponse<StaticMavenInfo> collect() {
+    StaticMavenInfo info = new StaticMavenInfo();
     info.setPoms(loadPoms());
     return CollectorResponse.succeed(info);
   }

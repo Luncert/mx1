@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.luncert.mx1.commons.data.IpcPacket;
+import org.luncert.mx1.commons.data.DataPacket;
 import org.luncert.mx1.commons.data.NetURL;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcFactory;
@@ -118,7 +118,7 @@ public class ProbeStubMain {
     assert daemonUrl != null && daemonUrl.getProtocol().equals("tcp");
     
     try {
-      ipcChannel = IpcFactory.<IpcPacket>tcp()
+      ipcChannel = IpcFactory.<DataPacket>tcp()
           .destination(new InetSocketAddress(daemonUrl.getHost(), daemonUrl.getPort()))
           //.addHandler(new DaemonConnectionHandler(collectorRegistry))
           .open();

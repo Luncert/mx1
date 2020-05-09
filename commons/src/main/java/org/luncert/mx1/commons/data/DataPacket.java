@@ -1,6 +1,7 @@
 package org.luncert.mx1.commons.data;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,9 +9,10 @@ import java.io.Serializable;
 import java.util.Properties;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IpcPacket<E> implements Serializable {
+public class DataPacket<E> implements Serializable {
   
   private static final long serialVersionUID = 8105488532451454597L;
 

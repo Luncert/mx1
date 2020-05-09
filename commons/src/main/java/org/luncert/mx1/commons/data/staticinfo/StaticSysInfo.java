@@ -13,7 +13,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StaticSystemInfo implements Serializable {
+public class StaticSysInfo implements Serializable {
   
   private static final long serialVersionUID = 2804806884681106916L;
   

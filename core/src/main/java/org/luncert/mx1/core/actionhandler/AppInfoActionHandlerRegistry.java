@@ -5,10 +5,10 @@ import org.luncert.mx1.core.actionmgr.ActionManager;
 import org.luncert.mx1.core.actionmgr.Message;
 import org.luncert.mx1.core.actionmgr.annotation.ActionHandler;
 import org.luncert.mx1.core.actionmgr.annotation.ActionHandlerRegistry;
-import org.luncert.mx1.core.common.constant.Action;
+import org.luncert.mx1.core.common.constant.WsAction;
 import org.luncert.mx1.core.common.constant.AppInfoType;
 import org.luncert.mx1.core.service.AppInfoConsumer;
-import org.luncert.mx1.core.service.ProbeService;
+import org.luncert.mx1.core.service.impl.ProbeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class AppInfoActionHandlerRegistry {
   private ActionManager actionManager;
   
   @Autowired
-  private ProbeService probeService;
+  private ProbeServiceImpl probeService;
   
   private final Map<String, AppInfoConsumer> consumerMap =
       ImmutableMap.<String, AppInfoConsumer>builder()
@@ -30,7 +30,7 @@ public class AppInfoActionHandlerRegistry {
           .put(AppInfoType.MEM_USAGE, this::consumeMemUsage)
           .build();
   
-  @ActionHandler(Action.MONITOR_APP_INFO)
+  @ActionHandler(WsAction.MONITOR_APP_INFO)
   public void monitorMonitorInfo(Message<String> message) {
     String infoType = message.getHeaders().getProperty("type");
     String probeId = message.getBody();
@@ -39,7 +39,7 @@ public class AppInfoActionHandlerRegistry {
   
   public void consumeCpuUsage(Object info) {
     // info.getCpuUsage
-    actionManager.createAction(Action.COMMIT_INFO)
+    actionManager.createAction(WsAction.COMMIT_INFO)
         .addHeader("type", AppInfoType.CPU_USAGE)
         .body(null)
         .submit();
@@ -47,7 +47,7 @@ public class AppInfoActionHandlerRegistry {
   
   public void consumeMemUsage(Object info) {
     // info.getMemUsage
-    actionManager.createAction(Action.COMMIT_INFO)
+    actionManager.createAction(WsAction.COMMIT_INFO)
         .addHeader("type", AppInfoType.MEM_USAGE)
         .body(null)
         .submit();

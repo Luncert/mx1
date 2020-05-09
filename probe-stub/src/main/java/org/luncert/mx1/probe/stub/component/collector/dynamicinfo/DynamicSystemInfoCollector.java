@@ -5,14 +5,14 @@ import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.Swap;
-import org.luncert.mx1.commons.data.dynamicinfo.DynamicSystemInfo;
+import org.luncert.mx1.commons.data.dynamicinfo.DynamicSysInfo;
 import org.luncert.mx1.commons.util.DoubleUtils;
 import org.luncert.mx1.probe.stub.component.collector.AbstractInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 import java.lang.management.ManagementFactory;
 
-public class DynamicSystemInfoCollector extends AbstractInfoCollector<DynamicSystemInfo> {
+public class DynamicSystemInfoCollector extends AbstractInfoCollector<DynamicSysInfo> {
   
   private Sigar sigar;
   
@@ -23,8 +23,8 @@ public class DynamicSystemInfoCollector extends AbstractInfoCollector<DynamicSys
   }
   
   @Override
-  public CollectorResponse<DynamicSystemInfo> collect() {
-    DynamicSystemInfo info = new DynamicSystemInfo();
+  public CollectorResponse<DynamicSysInfo> collect() {
+    DynamicSysInfo info = new DynamicSysInfo();
   
     try {
       // negative means unavailable

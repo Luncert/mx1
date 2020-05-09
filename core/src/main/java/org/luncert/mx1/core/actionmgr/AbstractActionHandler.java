@@ -19,7 +19,7 @@ public abstract class AbstractActionHandler<E> {
   public AbstractActionHandler(String bindingAction) {
     this.bindingAction = bindingAction;
     
-    // detect message body type through type argument of implementation of handle method.
+    // detect message body type through type argument of implementation of handleData method.
     Method handleMethod;
     
     try {
@@ -75,7 +75,7 @@ public abstract class AbstractActionHandler<E> {
    */
   void handleMessage(String rawMessage) {
     // deserialization referring messageBodyType
-    // invoke handle implementation
+    // invoke handleData implementation
     handle(JSON.parseObject(rawMessage, messageType));
   }
   
