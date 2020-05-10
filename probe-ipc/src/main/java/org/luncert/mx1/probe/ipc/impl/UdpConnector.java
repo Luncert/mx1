@@ -76,7 +76,7 @@ public class UdpConnector<E> implements Connector<E> {
       throw new IOException(e);
     }
   
-    log.info("Udp connector initialized.");
+    log.info("Udp connector initialized");
   
     return new IpcOutboundChannel();
   }
@@ -103,7 +103,7 @@ public class UdpConnector<E> implements Connector<E> {
       try {
         channel.close().sync();
         
-        log.info("UDP connection destroyed.");
+        log.info("UDP connection destroyed");
       } catch (InterruptedException e) {
         throw new IOException(e);
       } finally {

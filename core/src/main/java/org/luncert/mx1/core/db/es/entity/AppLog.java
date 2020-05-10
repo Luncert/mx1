@@ -22,6 +22,8 @@ public class AppLog implements Serializable {
   @Id
   private String id;
   
+  private String nodeId;
+  
   private long timestamp;
   
   private String logLevel;

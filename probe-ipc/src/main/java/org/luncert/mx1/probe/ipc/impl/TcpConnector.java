@@ -16,12 +16,12 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.luncert.mx1.commons.util.MarshallingCodeCFactory;
 import org.luncert.mx1.probe.ipc.Connector;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcDataHandler;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
@@ -95,13 +95,13 @@ public class TcpConnector<E> implements Connector<E> {
         
         channelFuture = bootstrap.bind(serveAddr);
       } else {
-        throw new IOException("neither serving address or destination is provided.");
+        throw new IOException("neither serving address or destination is provided");
       }
   
       channel = channelFuture.sync().channel();
 
       if (channelFuture.isSuccess()) {
-        log.debug("TCP connection opened.");
+        log.debug("TCP connection opened");
       }
       
       return tcpChannel;
@@ -181,7 +181,7 @@ public class TcpConnector<E> implements Connector<E> {
         // the channelFuture will be notified once the server is down
         channel.closeFuture().sync();
     
-        log.debug("TCP connection closed.");
+        log.debug("TCP connection closed");
       } catch (InterruptedException e) {
         throw new IOException(e);
       }

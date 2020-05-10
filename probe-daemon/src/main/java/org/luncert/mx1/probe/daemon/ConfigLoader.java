@@ -25,11 +25,11 @@ class ConfigLoader {
       .add(Option.builder("h").longOpt("help")
           .desc("help").hasArg(false)
           .build())
-      .add(Option.builder("s").longOpt("server")
-          .desc("address of central server").hasArg(true)
+      .add(Option.builder("c").longOpt("central")
+          .desc("address of central server").hasArg(true).required(true)
           .build())
       .add(Option.builder("b").longOpt("bind")
-          .desc("serving address of daemon").hasArg(true)
+          .desc("serving address of daemon").hasArg(true).required(true)
           .build())
       .add(Option.builder("noBanner").longOpt("noBanner")
           .desc("do not print banner").hasArg(false)
@@ -50,12 +50,12 @@ class ConfigLoader {
       
       // central server
       if (cmd.hasOption("s")) {
-        config.setCentralServer(cmd.getOptionValue("s"));
+        config.setCentralAddress(new NetURL(cmd.getOptionValue("s")));
       }
       
       // binding
       if (cmd.hasOption("b")) {
-        config.setServeAddress(new NetURL(cmd.getOptionValue("b")));
+        config.setBinding(new NetURL(cmd.getOptionValue("b")));
       }
       
       // banner

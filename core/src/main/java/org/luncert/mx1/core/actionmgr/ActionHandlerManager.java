@@ -39,7 +39,7 @@ public final class ActionHandlerManager {
     handlerList.addAll(loadAllHandlerImplementations());
     handlerList.addAll(buildHandlerWithRegistry());
     
-    log.info("Loaded action handlers: {}.", handlerList);
+    log.info("Loaded action handlers: {}", handlerList);
     
     // group by binding action
     Map<String, List<AbstractActionHandler>> handlerAfterGroupBy = handlerList.stream()
@@ -92,7 +92,7 @@ public final class ActionHandlerManager {
     }
     
     if (!method.getReturnType().getName().equals("void")) {
-      log.warn("Return value of action handler method {}#{} is redundant.",
+      log.warn("Return value of action handler method {}#{} is redundant",
           method.getDeclaringClass().getSimpleName(), method.getName());
     }
   }
@@ -105,7 +105,7 @@ public final class ActionHandlerManager {
     
     ActionHandlerChain chain = actionHandlerChainMap.get(action);
     if (chain == null) {
-      log.warn("No handler registered for action {}.", action);
+      log.warn("No handler registered for action {}", action);
     } else {
       chain.handle(rawMessage);
     }

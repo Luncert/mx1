@@ -4,14 +4,14 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.luncert.mx1.commons.constant.CollectorName;
 import org.luncert.mx1.probe.stub.component.collector.dynamicinfo.DynamicJvmInfoCollector;
 import org.luncert.mx1.probe.stub.component.collector.dynamicinfo.DynamicSystemInfoCollector;
-import org.luncert.mx1.probe.stub.component.collector.staticinfo.MavenInfoCollector;
+import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticMavenInfoCollector;
 import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticJvmInfoCollector;
-import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticSystemInfoCollector;
+import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticSysInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +21,11 @@ public class CollectorRegistry {
   
   // TODO: temporary solution, I will use package-scan or other way to register collectors in the future.
   private List<CollectorInfo> collectorList = ImmutableList.<CollectorInfo>builder()
-      .add(new CollectorInfo(DynamicJvmInfoCollector.class))
-      .add(new CollectorInfo(DynamicSystemInfoCollector.class))
-      .add(new CollectorInfo(MavenInfoCollector.class))
-      .add(new CollectorInfo(StaticJvmInfoCollector.class))
-      .add(new CollectorInfo(StaticSystemInfoCollector.class))
+      .add(CollectorInfo.of(CollectorName.DYNAMIC_SYS_INFO_COLLECTOR, DynamicSystemInfoCollector.class))
+      .add(CollectorInfo.of(CollectorName.DYNAMIC_JVM_INFO_COLLECTOR, DynamicJvmInfoCollector.class))
+      .add(CollectorInfo.of(CollectorName.STATIC_SYS_INFO_COLLECTOR, StaticSysInfoCollector.class))
+      .add(CollectorInfo.of(CollectorName.STATIC_JVM_INFO_COLLECTOR, StaticJvmInfoCollector.class))
+      .add(CollectorInfo.of(CollectorName.STATIC_MAVEN_INFO_COLLECTOR, StaticMavenInfoCollector.class))
       .build();
   
   private Map<String, CollectorInfo> collectorIndex = new HashMap<>();
@@ -40,9 +40,9 @@ public class CollectorRegistry {
         info.setState(CollectorState.AVAILABLE);
 
         // put into indexMap
-        collectorIndex.put(collectorType.getName(), info);
+        collectorIndex.put(collectorType.getSimpleName(), info);
       } catch (Exception e) {
-        log.error("Failed to instantiate {}.", collectorType, e);
+        log.error("Failed to instantiate {}", collectorType, e);
         info.setState(CollectorState.INITIALIZATION_FAILED);
       }
     }
@@ -51,7 +51,7 @@ public class CollectorRegistry {
   public boolean enable(String collectorName) {
     CollectorInfo info = collectorIndex.get(collectorName);
     if (info == null) {
-      log.warn("No collector has name {}.", collectorName);
+      log.warn("No collector has name {}", collectorName);
       return false;
     }
     
@@ -60,14 +60,14 @@ public class CollectorRegistry {
       return true;
     }
     
-    log.warn("Collector is {}, not able to be enabled.", info.getState().getValue());
+    log.warn("Collector is {}, not able to be enabled", info.getState().getValue());
     return false;
   }
   
   public boolean disable(String collectorName) {
     CollectorInfo info = collectorIndex.get(collectorName);
     if (info == null) {
-      log.warn("No collector has name {}.", collectorName);
+      log.warn("No collector has name {}", collectorName);
       return false;
     }
     
@@ -76,7 +76,7 @@ public class CollectorRegistry {
       return true;
     }
 
-    log.warn("Collector is {}, not able to be disabled.", info.getState().getValue());
+    log.warn("Collector is {}, not able to be disabled", info.getState().getValue());
     return false;
   }
   
@@ -84,12 +84,12 @@ public class CollectorRegistry {
   public <E> CollectorResponse<E> collect(String collectorName) {
     CollectorInfo info = collectorIndex.get(collectorName);
     if (info == null) {
-      log.warn("No collector has name {}.", collectorName);
+      log.warn("No collector has name {}", collectorName);
       return null;
     }
 
     if (!info.getState().equals(CollectorState.AVAILABLE)) {
-      log.warn("Collector {} is {}, cannot to collect.",
+      log.warn("Collector {} is {}, cannot to collect",
           info.getCollectorType(), info.getState().getValue());
       return null;
     }
@@ -106,6 +106,8 @@ public class CollectorRegistry {
     
     private static final int MAX_FAILURE_TIME = 3;
     
+    String collectorName;
+    
     @Setter
     @Getter
     CollectorState state = CollectorState.UNINITIALIZED;
@@ -119,8 +121,11 @@ public class CollectorRegistry {
     
     int invokeFailureCount;
     
-    CollectorInfo(Class<? extends AbstractInfoCollector> collectorType) {
-      this.collectorType = collectorType;
+    static CollectorInfo of(String collectorName, Class<? extends AbstractInfoCollector> collectorType) {
+      CollectorInfo collectorInfo = new CollectorInfo();
+      collectorInfo.collectorName = collectorName;
+      collectorInfo.collectorType = collectorType;
+      return collectorInfo;
     }
     
     CollectorResponse invokeCollect() {
@@ -132,7 +137,7 @@ public class CollectorRegistry {
           setState(CollectorState.UNAVAILABLE);
         }
         
-        log.error("Failed to invoke collect method of {}.", collectorType, e);
+        log.error("Failed to invoke collect method of {}", collectorType, e);
         return null;
       }
     }

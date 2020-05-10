@@ -6,9 +6,10 @@ import org.luncert.mx1.commons.data.NetURL;
 @Data
 public class Config {
   
-  private String centralServer;
+  private NetURL centralAddress;
+  
+  private NetURL binding;
   
   private boolean noBanner;
   
-  private NetURL serveAddress;
 }

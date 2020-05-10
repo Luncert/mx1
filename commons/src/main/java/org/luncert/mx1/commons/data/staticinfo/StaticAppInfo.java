@@ -9,7 +9,7 @@ public class StaticAppInfo implements Serializable {
   
   private static final long serialVersionUID = -8526362075553567065L;
   
-  private StaticSysInfo dynamicSystemInfo;
+  private StaticSysInfo staticSysInfo;
 
   private StaticJvmInfo staticJvmInfo;
   

@@ -12,7 +12,7 @@ public class StaticSysInfoCollectorTest {
   
   @Test
   public void test() {
-    StaticSystemInfoCollector collector = new StaticSystemInfoCollector();
+    StaticSysInfoCollector collector = new StaticSysInfoCollector();
     CollectorResponse<StaticSysInfo> rep = collector.collect();
     Assert.assertTrue(rep.isSuccess());
     System.out.println(rep.getInfo());

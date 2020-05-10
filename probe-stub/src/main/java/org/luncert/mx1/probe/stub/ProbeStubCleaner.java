@@ -21,7 +21,7 @@ public class ProbeStubCleaner implements Runnable {
       try {
         task.run();
       } catch (Exception e) {
-        log.error("Failed to execute shutdown task.", e);
+        log.error("Failed to execute shutdown task", e);
       }
     }
   }

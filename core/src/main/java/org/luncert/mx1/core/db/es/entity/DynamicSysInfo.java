@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
@@ -19,6 +20,11 @@ import java.io.Serializable;
 public class DynamicSysInfo implements Serializable {
   
   private static final long serialVersionUID = -3910586269418927149L;
+  
+  @Id
+  private String id;
+  
+  private String nodeId;
   
   private double loadAverage;
   

@@ -48,7 +48,7 @@ public class ActionManager {
         throw new RuntimeException(e);
       }
     } else {
-      log.warn("No session bound to this thread, action {} will be ignored.",
+      log.warn("No session bound to this thread, action {} will be ignored",
           message.getAction());
     }
   }

@@ -83,7 +83,7 @@ public class SpringBootAgentTransformer extends AgentTransformer {
           byteCode = ctClass.toBytecode();
           ctClass.detach();
         } catch (Exception e) {
-          log.error("Failed to transform class {}.", dotSplitClassName, e);
+          log.error("Failed to transform class {}", dotSplitClassName, e);
         }
       } else if (dotSplitClassName.equals(SPRING_CONTEXT_CLASS_NAME)) {
         // inspect AbstractApplicationContext
@@ -116,7 +116,7 @@ public class SpringBootAgentTransformer extends AgentTransformer {
       // Some code may throw an RuntimeException which
       // could will be ignored by the invoker of #transform who is loading classes,
       // so we try to catch any Exception.
-      log.error("Failed to transform class {}.", dotSplitClassName, e);
+      log.error("Failed to transform class {}", dotSplitClassName, e);
     }
     
     return byteCode;

@@ -42,7 +42,7 @@
 //    try {
 //      channelFuture = bootstrap.bind(DEFAULT_UDP_PORT).sync();
 //    } catch (InterruptedException e) {
-//      log.error("Exception on receive udp data.", e);
+//      log.error("Exception on receive udp data", e);
 //    }
 //  }
 //
@@ -68,7 +68,7 @@
 //      try {
 //        channelFuture.channel().closeFuture().wait();
 //      } catch (InterruptedException e) {
-//        log.error("Exception on release netty resources.", e);
+//        log.error("Exception on release netty resources", e);
 //      }
 //    }
 //  }

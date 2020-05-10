@@ -29,7 +29,7 @@ class ProbeSpyResourceClassLoader extends ClassLoader {
       // See java.net.MalformedURLException
       return new URL("jar", "", "file:" + spyJarPath + "!/" + name);
     } catch (IOException e) {
-      log.error("Failed to load probe-spy resource: {}.", name, e);
+      log.error("Failed to load probe-spy resource: {}", name, e);
       return null;
     }
   }

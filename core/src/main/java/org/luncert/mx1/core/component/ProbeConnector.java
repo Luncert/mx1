@@ -13,11 +13,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.luncert.mx1.core.util.MarshallingCodeCFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.luncert.mx1.commons.util.MarshallingCodeCFactory;
 import org.luncert.mx1.commons.data.NetURL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -28,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Scope("singleton")
-//@Component
+@Component
 public final class ProbeConnector {
   
   private static final NetURL DEFAULT_BINDING = new NetURL("tcp://localhost:43211");
@@ -42,18 +44,18 @@ public final class ProbeConnector {
   @Autowired
   private ProbeListener probeListener;
   
-  @Value("${mx1.binding}")
+  @Value("${mx1.binding:}")
   private String binding;
   
   @PostConstruct
   public void start() throws InterruptedException {
     NetURL url;
-    if (binding == null) {
+    if (StringUtils.isEmpty(binding)) {
       url = DEFAULT_BINDING;
-      log.info("Starting ProbeConnector on default binding {}.", url);
+      log.info("Starting ProbeConnector on default binding {}", url);
     } else {
       url = new NetURL(binding);
-      log.info("Starting ProbeConnector on {}.", url);
+      log.info("Starting ProbeConnector on {}", url);
     }
     
     ServerBootstrap bootstrap = new ServerBootstrap()
@@ -80,7 +82,7 @@ public final class ProbeConnector {
     channelFuture.sync();
   
     if (channelFuture.isSuccess()) {
-      log.info("ProbeConnector is up, listener is {}.", probeListener);
+      log.info("ProbeConnector is up, listener is {}", probeListener);
     }
   }
   

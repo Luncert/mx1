@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.luncert.mx1.commons.data.DataPacket;
-import org.luncert.mx1.commons.constant.IpcAction;
+import org.luncert.mx1.commons.constant.StubAction;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
@@ -43,7 +43,7 @@ public class CollectorSchedulerTest {
       assert object instanceof DataPacket;
       
       DataPacket<CollectorResponse> packet = (DataPacket<CollectorResponse>) object;
-      Assert.assertEquals(IpcAction.COMMIT_INFO, packet.getAction());
+      Assert.assertEquals(StubAction.COMMIT_INFO, packet.getAction());
       
       CollectorResponse rep = packet.getData();
       Assert.assertTrue(rep.isSuccess());

@@ -9,6 +9,7 @@ import org.luncert.mx1.commons.data.NetURL;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcFactory;
 import org.luncert.mx1.probe.stub.component.AgentTransformerFactory;
+import org.luncert.mx1.probe.stub.component.DaemonDataHandler;
 import org.luncert.mx1.probe.stub.component.collector.CollectorRegistry;
 import org.luncert.mx1.probe.stub.component.collector.CollectorScheduler;
 import org.luncert.mx1.probe.stub.exeception.LoadProbeSpyJarError;
@@ -39,7 +40,7 @@ public class ProbeStubMain {
   private static CollectorScheduler collectorScheduler;
   
   public static void premain(String agentOptions, Instrumentation inst) {
-    log.debug("Probe Stub on.");
+    log.debug("Probe Stub on");
 
     ProbeStubConfig config = ProbeStubConfig.resolveAgentOptions(agentOptions);
   
@@ -120,15 +121,15 @@ public class ProbeStubMain {
     try {
       ipcChannel = IpcFactory.<DataPacket>tcp()
           .destination(new InetSocketAddress(daemonUrl.getHost(), daemonUrl.getPort()))
-          //.addHandler(new DaemonConnectionHandler(collectorRegistry))
+          .addHandler(new DaemonDataHandler(collectorRegistry))
           .open();
   
       collectorScheduler = new CollectorScheduler(collectorRegistry, ipcChannel);
       collectorScheduler.start();
       
-      log.debug("CollectorScheduler started.");
+      log.debug("CollectorScheduler started");
     } catch (IOException e) {
-      log.error("Failed to start collecting.", e);
+      log.error("Failed to start collecting", e);
     }
   }
   

@@ -1,12 +1,15 @@
 package org.luncert.mx1.core.service;
 
+import org.luncert.mx1.core.common.AppInfoConsumer;
+
 public interface IProbeService {
   
   /**
    *
-   * @param probeId
+   * @param nodeId
+   * @param type
    * @param consumer
    * @return Subscription
    */
-  Subscription subscribe(String probeId, AppInfoConsumer consumer);
+  <E> Subscription subscribe(String nodeId, Class<E> type, AppInfoConsumer<E> consumer);
 }

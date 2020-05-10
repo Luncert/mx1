@@ -3,7 +3,7 @@ package org.luncert.mx1.probe.stub.component.collector;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.luncert.mx1.commons.constant.IpcAction;
+import org.luncert.mx1.commons.constant.StubAction;
 import org.luncert.mx1.commons.data.DataPacket;
 import org.luncert.mx1.commons.util.PropertiesUtils;
 import org.luncert.mx1.probe.ipc.IpcChannel;
@@ -103,14 +103,14 @@ public final class CollectorScheduler {
       // do collecting
       CollectorResponse rep = registry.collect(collectorName);
       try {
-        ipcChannel.write(new DataPacket<>(IpcAction.COMMIT_INFO,
+        ipcChannel.write(new DataPacket<>(StubAction.COMMIT_DYNAMIC_INFO,
             PropertiesUtils.builder()
                 .put("success", rep.isSuccess())
                 .put("collectorName", collectorName)
                 .build(),
             rep.getInfo()));
       } catch (IOException e) {
-        log.error("Failed to send data to daemon.", e);
+        log.error("Failed to send data to daemon", e);
         // TODO: stop collector scheduler
       }
     }

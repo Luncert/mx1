@@ -46,7 +46,7 @@ class ProbeEventHandlerManager {
           ProbeEventHandler annotation = method.getAnnotation(ProbeEventHandler.class);
           if (annotation != null) {
             if (!Modifier.isStatic(method.getModifiers())) {
-              log.error("Probe event handler method must be public and static: {}.",
+              log.error("Probe event handler method must be public and static: {}",
                   methodToString(method));
               continue;
             }
@@ -60,7 +60,7 @@ class ProbeEventHandlerManager {
       
       handlers.forEach(handler -> ProbeSpy.register(handler.getEventName(), handler));
       
-      log.debug("Following handler has been registered: {}.", handlers);
+      log.debug("Following handler has been registered: {}", handlers);
     }
   }
   
@@ -114,7 +114,7 @@ class ProbeEventHandlerManager {
         }
       }
     } catch (IOException | ClassNotFoundException | URISyntaxException e) {
-      log.error("Failed to scan all probe event handlers.", e);
+      log.error("Failed to scan all probe event handlers", e);
     }
     
     return classList;
@@ -153,7 +153,7 @@ class ProbeEventHandlerManager {
         // even though the handler method is static, the object arg (null) is needed
         return handlerMethod.invoke(null, event);
       } catch (IllegalAccessException | InvocationTargetException e) {
-        log.error("Failed to invoke handler method {}.", toString(), e);
+        log.error("Failed to invoke handler method {}", toString(), e);
         return null;
       }
     }

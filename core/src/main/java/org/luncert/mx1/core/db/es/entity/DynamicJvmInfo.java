@@ -26,6 +26,8 @@ public class DynamicJvmInfo implements Serializable {
   @Id
   private String id;
   
+  private String nodeId;
+  
   private List<GarbageCollectorInfo> garbageCollectorInfoList;
   
   private int loadedClassCount;

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.luncert.mx1.commons.data.staticinfo.StaticMavenInfo;
 import org.luncert.mx1.commons.data.staticinfo.StaticJvmInfo;
 import org.luncert.mx1.commons.data.staticinfo.StaticSysInfo;
@@ -12,7 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
-import java.net.URL;
+import java.net.InetAddress;
 
 @Data
 @Builder
@@ -27,9 +26,11 @@ public class NodeMetadata implements Serializable {
    * cipher of probe net address
    */
   @Id
-  private ObjectId id;
+  private String id;
   
-  private URL netAddress;
+  private InetAddress netAddress;
+  
+  private long lastUpdateTimestamp;
   
   // app info
   
