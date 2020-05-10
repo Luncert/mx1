@@ -1,0 +1,99 @@
+
+.dashboard-container {
+    display: flex;
+    width: 100%; height: 100%;
+    flex-flow: row nowrap;
+    justify-content: left;
+}
+
+.node-list {
+    display: inline-block;
+    width: 150px; height: 100%;
+    text-align: center;
+    background-color: rgb(226, 226, 226);
+}
+
+.node-list-item {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.node-list-item::before {
+    content: '';
+    position: absolute;
+    left: 0px; top: 3px;
+    width: 10px; height: calc(100% - 6px);
+    box-shadow: 0px 0px 3px rgb(177, 177, 177);
+}
+
+.selected-node {
+    background-color: white;
+}
+
+.available-node::before {
+    background-color: rgb(3, 204, 3);
+}
+
+.unavailable-node::before {
+    background-color: rgb(204, 3, 3);
+}
+
+/* node detail */
+
+.node-detail {
+    display: flex;
+    position: relative;
+    width: calc(100% - 150px); height: 100%;
+    /* border-left: solid 1px rgb(173, 173, 173); */
+}
+
+.node-dynamic-info {
+    position: relative;
+    width: calc(70% - 10px); height: 100%;
+}
+
+.node-metadata {
+    position: relative;
+    box-sizing: border-box;
+    left: 20px;
+    width: calc(30% - 10px); height: 100%;
+    padding: 5px 10px 5px 0px;
+}
+
+/* divider */
+.node-metadata::before {
+    content: '';
+    position: absolute;
+    width: 1px; height: 96%;
+    left: -11px; top: 2%;
+    background-color: rgb(216, 216, 216);
+}
+
+.node-metadata-item {
+    display: block;
+    margin-top: 20px;
+}
+
+.node-metadata-item:nth-of-type(1) {
+    margin-top: 0px;
+}
+
+.node-metadata-item .title {
+    display: inline-block;
+    padding-bottom: 2px;
+    font-size: large;
+    border-bottom: solid 1px rgb(216, 216, 216);
+}
+
+.node-metadata-item-field {
+
+}
+
+.node-metadata-item-field .field-name {
+
+}
+
+.node-metadata-item-field .field-value {
+    
+}
