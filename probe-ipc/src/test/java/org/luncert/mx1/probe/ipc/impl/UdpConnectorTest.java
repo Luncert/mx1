@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcDataHandler;
+import org.luncert.mx1.probe.ipc.IpcDataHandlerAdapter;
 import org.luncert.mx1.probe.ipc.IpcFactory;
 
 import java.io.IOException;
@@ -17,15 +18,10 @@ public class UdpConnectorTest {
     IpcChannel readChannel = IpcFactory.udp()
         .port(55001)
         .destination(55000)
-        .handler(new IpcDataHandler() {
+        .handler(new IpcDataHandlerAdapter() {
           @Override
           public void onData(IpcChannel channel, Object data) {
             System.out.println("received: " + data);
-          }
-  
-          @Override
-          public void onClose() {
-    
           }
         })
         .open();

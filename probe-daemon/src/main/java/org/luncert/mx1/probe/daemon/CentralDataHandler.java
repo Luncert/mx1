@@ -17,6 +17,7 @@ public class CentralDataHandler extends ChannelInboundHandlerAdapter {
         DataPacketUtils.validateDataType(packet, String.class)) {
       String nodeId = (String) packet.getData();
       NodeIdHolder.set(nodeId);
+      log.info("Registered probe with id: {}", nodeId);
     } else {
     
     }

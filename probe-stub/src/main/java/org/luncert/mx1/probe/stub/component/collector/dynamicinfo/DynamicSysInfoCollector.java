@@ -12,11 +12,11 @@ import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 import java.lang.management.ManagementFactory;
 
-public class DynamicSystemInfoCollector extends AbstractInfoCollector<DynamicSysInfo> {
+public class DynamicSysInfoCollector extends AbstractInfoCollector<DynamicSysInfo> {
   
   private Sigar sigar;
   
-  public DynamicSystemInfoCollector() {
+  public DynamicSysInfoCollector() {
     // NOTE: possible exception: no sigar-amd64-winnt.dll in java.library.path
     // see: https://stackoverflow.com/questions/27404471/org-hyperic-sigar-sigarexception-no-sigar-amd64-winnt-dll-in-java-library-path
     sigar = new Sigar();

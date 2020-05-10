@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 import org.luncert.mx1.commons.data.staticinfo.StaticMavenInfo;
 import org.luncert.mx1.commons.data.staticinfo.StaticJvmInfo;
 import org.luncert.mx1.commons.data.staticinfo.StaticSysInfo;
+import org.luncert.mx1.core.common.NetAddress;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 
 @Data
 @Builder
@@ -28,7 +28,7 @@ public class NodeMetadata implements Serializable {
   @Id
   private String id;
   
-  private InetAddress netAddress;
+  private NetAddress netAddress;
   
   private long lastUpdateTimestamp;
   

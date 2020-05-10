@@ -13,15 +13,19 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.luncert.mx1.commons.data.NetURL;
 import org.luncert.mx1.commons.util.MarshallingCodeCFactory;
 import org.luncert.mx1.probe.ipc.Connector;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcDataHandler;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +42,9 @@ public class TcpConnector<E> implements Connector<E> {
   
   private SocketAddress dest;
   
-  private Channel channel;
+  private Channel nettyChannel;
+  
+  private volatile Channel remoteChannel;
   
   private IpcChannel tcpChannel = new TcpChannel();
   
@@ -98,7 +104,7 @@ public class TcpConnector<E> implements Connector<E> {
         throw new IOException("neither serving address or destination is provided");
       }
   
-      channel = channelFuture.sync().channel();
+      nettyChannel = channelFuture.sync().channel();
 
       if (channelFuture.isSuccess()) {
         log.debug("TCP connection opened");
@@ -115,8 +121,15 @@ public class TcpConnector<E> implements Connector<E> {
     @Override
     public void initChannel(SocketChannel ch) {
       ch.pipeline()
+          // TooLongFrameException: default frame length limit: 4096
+          // ref:
+          // https://www.jianshu.com/p/a0a51fd79f62
+          // https://docs.jboss.org/netty/3.1/api/org/jboss/netty/handler/codec/frame/LengthFieldBasedFrameDecoder.html
+          // https://stackoverflow.com/questions/53147024/netty-tcp-client-server-file-transfer-exception-toolongframeexception
+          //.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 4, 0, 4))
+          //.addLast("frameEncoder", new LengthFieldPrepender(4))
           .addLast(MarshallingCodeCFactory.buildMarshallingEncoder()) // outbound handler
-          .addLast(MarshallingCodeCFactory.buildMarshallingDecoder()) // inbound handler
+          .addLast(MarshallingCodeCFactory.buildMarshallingDecoder()) // inbound handler, max frame length: 1024 * 1024
           .addLast(new TcpDataHandler());
       // create new TcpDataHandler for each connection
     }
@@ -136,12 +149,24 @@ public class TcpConnector<E> implements Connector<E> {
     }
     
     @Override
-    public void channelActive(ChannelHandlerContext ctx) {
+    public void channelActive(ChannelHandlerContext ctx) throws IOException {
+      remoteChannel = ctx.channel();
+  
+      for (IpcDataHandler<E> handler : handlerList) {
+        handler.onOpen(tcpChannel);
+      }
+      
       ctx.fireChannelActive();
     }
   
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+      remoteChannel = null;
+  
+      for (IpcDataHandler<E> handler : handlerList) {
+        handler.onClose();
+      }
+      
       ctx.fireChannelInactive();
     }
   
@@ -157,8 +182,10 @@ public class TcpConnector<E> implements Connector<E> {
   
     @Override
     public synchronized void write(Object object) throws IOException {
+      checkRemoteAvailability();
+  
       // NOTE: check whether obj and its fields are all serializable
-      ChannelFuture future = channel.writeAndFlush(object);
+      ChannelFuture future = remoteChannel.writeAndFlush(object);
       
       // TODO: figure out the reason why receiver cannot receive data
       //  if I delete following part.
@@ -179,11 +206,25 @@ public class TcpConnector<E> implements Connector<E> {
         // channel.close doesn't mean to close the tcp server,
         // but just request to close this channel and block current thread,
         // the channelFuture will be notified once the server is down
-        channel.closeFuture().sync();
+        nettyChannel.closeFuture().sync();
     
         log.debug("TCP connection closed");
       } catch (InterruptedException e) {
         throw new IOException(e);
+      }
+    }
+    
+    @Override
+    public NetURL getRemoteAddress() throws IOException {
+      checkRemoteAvailability();
+      
+      InetSocketAddress socketAddress = (InetSocketAddress) remoteChannel.remoteAddress();
+      return new NetURL("tcp", socketAddress.getHostString(), socketAddress.getPort());
+    }
+    
+    private void checkRemoteAvailability() throws IOException {
+      if (remoteChannel == null) {
+        throw new IOException("remote is not available");
       }
     }
     

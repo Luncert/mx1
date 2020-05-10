@@ -8,6 +8,7 @@ import org.luncert.mx1.commons.data.dynamicinfo.DynamicJvmInfo;
 import org.luncert.mx1.commons.data.dynamicinfo.DynamicSysInfo;
 import org.luncert.mx1.commons.data.staticinfo.StaticAppInfo;
 import org.luncert.mx1.commons.util.DataPacketUtils;
+import org.luncert.mx1.core.common.NetAddress;
 import org.luncert.mx1.core.component.ProbeListener;
 import org.luncert.mx1.core.component.Session;
 import org.luncert.mx1.core.common.AppInfoConsumer;
@@ -73,7 +74,10 @@ public class ProbeServiceImpl extends ProbeListener<DataPacket> implements IProb
     // NOTE: netty's DomainSocketAddress is a sub-class of InetSocketAddress
     InetSocketAddress socketAddress = (InetSocketAddress) session.getRemoteAddress();
     
-    String nodeId = nodeService.register(socketAddress.getAddress(), packet.getData());
+    String nodeId = nodeService.register(NetAddress.of(socketAddress), packet.getData());
+  
+    session.set("nodeId", nodeId);
+  
     session.getChannel().writeAndFlush(DataPacket.builder()
         .action(CoreAction.REP_NODE_ID)
         .data(nodeId)

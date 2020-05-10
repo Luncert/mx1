@@ -8,8 +8,7 @@ public class Config {
   
   private NetURL centralAddress;
   
-  private NetURL binding;
+  private NetURL ipcAddress;
   
   private boolean noBanner;
-  
 }

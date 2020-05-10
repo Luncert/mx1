@@ -3,12 +3,11 @@ package org.luncert.mx1.probe.stub.component.collector;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.luncert.mx1.commons.constant.CollectorName;
 import org.luncert.mx1.commons.constant.StubAction;
 import org.luncert.mx1.commons.data.DataPacket;
 import org.luncert.mx1.commons.util.PropertiesUtils;
 import org.luncert.mx1.probe.ipc.IpcChannel;
-import org.luncert.mx1.probe.stub.component.collector.dynamicinfo.DynamicJvmInfoCollector;
-import org.luncert.mx1.probe.stub.component.collector.dynamicinfo.DynamicSystemInfoCollector;
 import org.luncert.mx1.probe.stub.pojo.CollectorResponse;
 
 import java.io.IOException;
@@ -21,10 +20,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class CollectorScheduler {
   
   // TODO: temporary solution
-  private static final ImmutableList<Class<? extends AbstractInfoCollector>> COLLECTOR_LIST =
+  private final ImmutableList<Plan> plans =
       ImmutableList.of(
-          DynamicSystemInfoCollector.class,
-          DynamicJvmInfoCollector.class
+          new Plan(CollectorName.DYNAMIC_SYS_INFO_COLLECTOR, 100),
+          new Plan(CollectorName.DYNAMIC_JVM_INFO_COLLECTOR, 100)
       );
   
   private CollectorRegistry registry;
@@ -40,8 +39,8 @@ public final class CollectorScheduler {
     this.registry = registry;
     this.ipcChannel = ipcChannel;
     
-    for (Class<? extends AbstractInfoCollector> collector : COLLECTOR_LIST) {
-      activePlans.put(collector.getName(), new Plan(collector.getName(), 100));
+    for (Plan plan : plans) {
+      activePlans.put(plan.getCollectorName(), plan);
     }
   }
   
@@ -79,7 +78,7 @@ public final class CollectorScheduler {
   }
   
   @Getter
-  private class Plan extends TimerTask {
+  public class Plan extends TimerTask {
     
     private final String collectorName;
     

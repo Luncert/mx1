@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.lang3.StringUtils;
-import org.luncert.mx1.commons.constant.DaemonAction;
 import org.luncert.mx1.commons.constant.ProbeAction;
 import org.luncert.mx1.commons.data.DataPacket;
 import org.luncert.mx1.commons.data.NetURL;
@@ -23,14 +22,15 @@ public class ProbeDaemonMain implements Daemon {
   
   private IpcChannel ipcChannel;
   
-  private CentralService centralService;
+  private CentralConnector centralConnector;
   
   /**
    * provide for commons-daemon to invoke
    */
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     if (args.length == 0) {
-      throw new Exception("start/stop action argument missing");
+      log.error("start/stop action argument missing");
+      return;
     }
     
     String[] filteredArgs = new String[args.length - 1];
@@ -43,9 +43,16 @@ public class ProbeDaemonMain implements Daemon {
       app.loadConfig(filteredArgs);
       
       Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
-      
-      app.start();
-      
+  
+      try {
+        app.start();
+      } catch (Exception e) {
+        log.error("Failed to start daemon", e);
+        
+        // FIXME: program won't exit without following line, what happens when main() exited
+        System.exit(-1);
+      }
+  
       // NOTE: daemon won't exit when execution of main has done.
       // ref: https://stackoverflow.com/questions/2614774/what-can-cause-java-to-keep-running-after-system-exit
       // Reason: daemon is blocked by invoking app.stop() -> ipcChannel.close() -> netty.close()
@@ -75,29 +82,27 @@ public class ProbeDaemonMain implements Daemon {
     }
     
     // connect to central
+    // TODO: reconnect to central
     NetURL centralAddress = config.getCentralAddress();
-    centralService = new CentralService();
-    centralService.connect(new InetSocketAddress(centralAddress.getHost(), centralAddress.getPort()),
+    centralConnector = new CentralConnector();
+    centralConnector.connect(new InetSocketAddress(centralAddress.getHost(), centralAddress.getPort()),
         new CentralDataHandler());
-    Channel centralChannel = centralService.getChannel();
+    Channel centralChannel = centralConnector.getChannel();
+    log.info("Central connection is ready");
     
     // connect to probe-stub
-    NetURL binding = config.getBinding();
+    NetURL binding = config.getIpcAddress();
     ipcChannel = IpcFactory.<DataPacket>tcp()
         .bind(new InetSocketAddress(binding.getHost(), binding.getPort()))
         .addHandler(new StubDataHandler(centralChannel))
         .open();
+    log.info("Probe-stub connection is ready");
     
     // register probe to central or notify central probe is available.
     String nodeId = NodeIdHolder.get();
-    if (StringUtils.isEmpty(nodeId)) {
-      // probe has no nodeId, so wee need to send an request to stub to collect static app info,
-      // and then register probe to central with the static app info
-      ipcChannel.write(DataPacket.builder()
-          .action(DaemonAction.COLLECT_STATIC_APP_INFO)
-          .build());
-    } else {
+    if (!StringUtils.isEmpty(nodeId)) {
       // send probe nodeId to central to let him know probe is back
+      // another case: StubDataHandler#onOpen()
       centralChannel.writeAndFlush(DataPacket.builder()
           .action(ProbeAction.UPDATE_METADATA)
           .headers(PropertiesUtils.builder()
@@ -114,16 +119,22 @@ public class ProbeDaemonMain implements Daemon {
   
   @Override
   public void stop() {
-    try {
-      centralService.close();
-    } catch (Exception e) {
-      log.error("Failed to close connection to central", e);
+    if (centralConnector != null) {
+      try {
+        centralConnector.close();
+        log.info("Connection to central is closed");
+      } catch (Exception e) {
+        log.error("Failed to close connection to central", e);
+      }
     }
     
-    try {
-      ipcChannel.close();
-    } catch (Exception e) {
-      log.error("Failed to close ipc connection", e);
+    if (ipcChannel != null) {
+      try {
+        ipcChannel.close();
+        log.info("Ipc channel is closed");
+      } catch (Exception e) {
+        log.error("Failed to close ipc channel", e);
+      }
     }
     
     log.info("Daemon is down");

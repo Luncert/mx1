@@ -2,13 +2,16 @@ package org.luncert.mx1.core.service.impl;
 
 import com.google.common.collect.Lists;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
+import org.luncert.mx1.commons.data.NetURL;
 import org.luncert.mx1.commons.data.dynamicinfo.DynamicJvmInfo;
 import org.luncert.mx1.commons.data.dynamicinfo.DynamicSysInfo;
 import org.luncert.mx1.commons.data.staticinfo.StaticAppInfo;
 import org.luncert.mx1.commons.util.DoubleUtils;
+import org.luncert.mx1.core.common.NetAddress;
 import org.luncert.mx1.core.db.es.repo.IAppLogRepo;
 import org.luncert.mx1.core.db.es.repo.IDynamicJvmInfoRepo;
 import org.luncert.mx1.core.db.es.repo.IDynamicSysInfoRepo;
@@ -22,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +52,7 @@ public class NodeServiceImpl implements INodeService {
   private Map<String, NodeStatus> nodeStatusMap = new ConcurrentHashMap<>();
   
   @Override
-  public String register(InetAddress remoteAddress, StaticAppInfo staticAppInfo) {
+  public String register(NetAddress remoteAddress, StaticAppInfo staticAppInfo) {
     NodeMetadata metadata = NodeMetadata.builder()
         .id(CommonUtils.netAddrId(remoteAddress))
         .netAddress(remoteAddress)
@@ -67,7 +69,7 @@ public class NodeServiceImpl implements INodeService {
   }
   
   @Override
-  public void updateNodeMetadata(String nodeId, Map<String, Object> newMetadata) {
+  public void updateNodeMetadata(@NonNull String nodeId, Map<String, Object> newMetadata) {
     updateNodeStatus(nodeId);
     updateLastUpdateTimestamp(nodeId);
     
@@ -118,7 +120,7 @@ public class NodeServiceImpl implements INodeService {
   }
   
   @Override
-  public void saveDynamicJvmInfo(String nodeId, DynamicJvmInfo dynamicJvmInfo) {
+  public void saveDynamicJvmInfo(@NonNull String nodeId, DynamicJvmInfo dynamicJvmInfo) {
     updateNodeStatus(nodeId);
     updateLastUpdateTimestamp(nodeId);
     
@@ -141,7 +143,7 @@ public class NodeServiceImpl implements INodeService {
   }
   
   @Override
-  public void saveDynamicSysInfo(String nodeId, DynamicSysInfo dynamicSysInfo) {
+  public void saveDynamicSysInfo(@NonNull String nodeId, DynamicSysInfo dynamicSysInfo) {
     updateNodeStatus(nodeId);
     updateLastUpdateTimestamp(nodeId);
     
@@ -156,7 +158,7 @@ public class NodeServiceImpl implements INodeService {
   }
   
   @Override
-  public void saveAppLog(String nodeId) {
+  public void saveAppLog(@NonNull String nodeId) {
     updateNodeStatus(nodeId);
     updateLastUpdateTimestamp(nodeId);
     
@@ -164,7 +166,10 @@ public class NodeServiceImpl implements INodeService {
   
   private void updateLastUpdateTimestamp(String nodeId) {
     nodeMetadataRepo.findById(nodeId)
-        .ifPresent(metadata -> metadata.setLastUpdateTimestamp(System.currentTimeMillis()));
+        .ifPresent(metadata -> {
+          metadata.setLastUpdateTimestamp(System.currentTimeMillis());
+          nodeMetadataRepo.save(metadata);
+        });
   }
   
   private void updateNodeStatus(String nodeId) {

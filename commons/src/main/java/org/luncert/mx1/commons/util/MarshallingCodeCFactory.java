@@ -22,7 +22,7 @@ public class MarshallingCodeCFactory {
     final MarshallingConfiguration configuration = new MarshallingConfiguration();
     configuration.setVersion(5); // 设置版本号为5
     UnmarshallerProvider provider = new DefaultUnmarshallerProvider(factory, configuration);
-    return new MarshallingDecoder(provider, 4096);
+    return new MarshallingDecoder(provider, 1024 * 1024);
   }
   
   /**

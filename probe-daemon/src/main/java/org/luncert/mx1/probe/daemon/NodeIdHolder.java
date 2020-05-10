@@ -33,18 +33,18 @@ public class NodeIdHolder {
   
   private NodeIdHolder() {}
   
-  public synchronized static void set(String nodeId) {
+  public synchronized static void set(String newId) {
     if (!StringUtils.isEmpty(nodeId)) {
       throw new UnsupportedOperationException("daemon has already been assigned a node id.");
     }
     
-    NodeIdHolder.nodeId = nodeId;
+    nodeId = newId;
     
     // save to fs
     File file = FileUtils.getTempDirectory();
     File nodeIdFile = Paths.get(file.getAbsolutePath(), "mx1probe-node-id").toFile();
     try {
-      FileUtils.write(nodeIdFile, nodeId, Charset.defaultCharset());
+      FileUtils.write(nodeIdFile, newId, Charset.defaultCharset());
     } catch (IOException e) {
       throw new SaveNodeIdError(e);
     }

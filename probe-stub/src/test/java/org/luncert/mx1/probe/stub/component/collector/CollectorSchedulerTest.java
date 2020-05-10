@@ -43,7 +43,7 @@ public class CollectorSchedulerTest {
       assert object instanceof DataPacket;
       
       DataPacket<CollectorResponse> packet = (DataPacket<CollectorResponse>) object;
-      Assert.assertEquals(StubAction.COMMIT_INFO, packet.getAction());
+      Assert.assertEquals(StubAction.COMMIT_DYNAMIC_INFO, packet.getAction());
       
       CollectorResponse rep = packet.getData();
       Assert.assertTrue(rep.isSuccess());

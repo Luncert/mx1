@@ -28,8 +28,8 @@ class ConfigLoader {
       .add(Option.builder("c").longOpt("central")
           .desc("address of central server").hasArg(true).required(true)
           .build())
-      .add(Option.builder("b").longOpt("bind")
-          .desc("serving address of daemon").hasArg(true).required(true)
+      .add(Option.builder("i").longOpt("ipc")
+          .desc("ipc url used to connect to probe-stub").hasArg(true).required(true)
           .build())
       .add(Option.builder("noBanner").longOpt("noBanner")
           .desc("do not print banner").hasArg(false)
@@ -38,6 +38,7 @@ class ConfigLoader {
   
   static Config load(String[] args) {
     CommandLineParser parser = new DefaultParser();
+    
     try {
       CommandLine cmd = parser.parse(getOptions(), args);
       
@@ -49,14 +50,10 @@ class ConfigLoader {
       Config config = new Config();
       
       // central server
-      if (cmd.hasOption("s")) {
-        config.setCentralAddress(new NetURL(cmd.getOptionValue("s")));
-      }
+      config.setCentralAddress(new NetURL(cmd.getOptionValue("c")));
       
-      // binding
-      if (cmd.hasOption("b")) {
-        config.setBinding(new NetURL(cmd.getOptionValue("b")));
-      }
+      // ipcAddress
+      config.setIpcAddress(new NetURL(cmd.getOptionValue("i")));
       
       // banner
       if (cmd.hasOption("noBanner")) {
@@ -66,8 +63,9 @@ class ConfigLoader {
       return config;
     } catch (ParseException e) {
       printParseError(e);
+      System.exit(-1);
+      return null;
     }
-    return null;
   }
   
   private static Options getOptions() {

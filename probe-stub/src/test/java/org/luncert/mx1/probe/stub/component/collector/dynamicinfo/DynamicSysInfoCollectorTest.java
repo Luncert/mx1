@@ -12,7 +12,7 @@ public class DynamicSysInfoCollectorTest {
   
   @Test
   public void testSuccess() {
-    DynamicSystemInfoCollector collector = new DynamicSystemInfoCollector();
+    DynamicSysInfoCollector collector = new DynamicSysInfoCollector();
   
     CollectorResponse<DynamicSysInfo> rep = collector.collect();
     Assert.assertTrue(rep.getDescription(), rep.isSuccess());

@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.luncert.mx1.commons.constant.CollectorName;
 import org.luncert.mx1.probe.stub.component.collector.dynamicinfo.DynamicJvmInfoCollector;
-import org.luncert.mx1.probe.stub.component.collector.dynamicinfo.DynamicSystemInfoCollector;
+import org.luncert.mx1.probe.stub.component.collector.dynamicinfo.DynamicSysInfoCollector;
 import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticMavenInfoCollector;
 import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticJvmInfoCollector;
 import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticSysInfoCollector;
@@ -21,7 +21,7 @@ public class CollectorRegistry {
   
   // TODO: temporary solution, I will use package-scan or other way to register collectors in the future.
   private List<CollectorInfo> collectorList = ImmutableList.<CollectorInfo>builder()
-      .add(CollectorInfo.of(CollectorName.DYNAMIC_SYS_INFO_COLLECTOR, DynamicSystemInfoCollector.class))
+      .add(CollectorInfo.of(CollectorName.DYNAMIC_SYS_INFO_COLLECTOR, DynamicSysInfoCollector.class))
       .add(CollectorInfo.of(CollectorName.DYNAMIC_JVM_INFO_COLLECTOR, DynamicJvmInfoCollector.class))
       .add(CollectorInfo.of(CollectorName.STATIC_SYS_INFO_COLLECTOR, StaticSysInfoCollector.class))
       .add(CollectorInfo.of(CollectorName.STATIC_JVM_INFO_COLLECTOR, StaticJvmInfoCollector.class))
@@ -80,6 +80,11 @@ public class CollectorRegistry {
     return false;
   }
   
+  /**
+   * @param collectorName collectorName
+   * @return null if target collector not found or target collector is unavailable,
+   * otherwise CollectorResponse
+   */
   @SuppressWarnings("unchecked")
   public <E> CollectorResponse<E> collect(String collectorName) {
     CollectorInfo info = collectorIndex.get(collectorName);
@@ -138,7 +143,7 @@ public class CollectorRegistry {
         }
         
         log.error("Failed to invoke collect method of {}", collectorType, e);
-        return null;
+        return CollectorResponse.failed(e.getMessage());
       }
     }
   }

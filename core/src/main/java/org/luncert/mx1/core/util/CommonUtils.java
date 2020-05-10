@@ -1,5 +1,7 @@
 package org.luncert.mx1.core.util;
 
+import org.luncert.mx1.commons.data.NetURL;
+import org.luncert.mx1.core.common.NetAddress;
 import org.springframework.util.DigestUtils;
 
 import java.net.InetAddress;
@@ -15,7 +17,7 @@ public final class CommonUtils {
     return UUID.randomUUID().toString();
   }
   
-  public static String netAddrId(InetAddress netAddr) {
+  public static String netAddrId(NetAddress netAddr) {
     // data is array with 16 items
     return DigestUtils.md5DigestAsHex(netAddr.toString().getBytes());
   }

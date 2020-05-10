@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcDataHandler;
+import org.luncert.mx1.probe.ipc.IpcDataHandlerAdapter;
 import org.luncert.mx1.probe.ipc.IpcFactory;
 
 import java.io.IOException;
@@ -39,16 +40,10 @@ public class TcpConnectorTest {
     
     IpcChannel readChannel = IpcFactory.<DataPacket>tcp()
         .bind(serveAddr)
-        .addHandler(new IpcDataHandler<DataPacket>() {
-
+        .addHandler(new IpcDataHandlerAdapter<DataPacket>() {
           @Override
           public void onData(IpcChannel channel, DataPacket data) {
             System.out.println("Received: " + data);
-          }
-  
-          @Override
-          public void onClose() {
-    
           }
         })
         .open();

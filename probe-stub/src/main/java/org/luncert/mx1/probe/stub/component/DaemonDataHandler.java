@@ -1,19 +1,16 @@
 package org.luncert.mx1.probe.stub.component;
 
 import lombok.extern.slf4j.Slf4j;
+import org.luncert.mx1.commons.constant.CollectorName;
 import org.luncert.mx1.commons.constant.DaemonAction;
 import org.luncert.mx1.commons.data.DataPacket;
 import org.luncert.mx1.commons.constant.StubAction;
 import org.luncert.mx1.commons.data.staticinfo.StaticAppInfo;
 import org.luncert.mx1.commons.data.staticinfo.StaticJvmInfo;
-import org.luncert.mx1.commons.data.staticinfo.StaticMavenInfo;
 import org.luncert.mx1.commons.data.staticinfo.StaticSysInfo;
 import org.luncert.mx1.probe.ipc.IpcChannel;
 import org.luncert.mx1.probe.ipc.IpcDataHandler;
 import org.luncert.mx1.probe.stub.component.collector.CollectorRegistry;
-import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticMavenInfoCollector;
-import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticJvmInfoCollector;
-import org.luncert.mx1.probe.stub.component.collector.staticinfo.StaticSysInfoCollector;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -28,6 +25,11 @@ public class DaemonDataHandler implements IpcDataHandler<DataPacket> {
     this.collectorRegistry = collectorRegistry;
   }
   
+  @Override
+  public void onOpen(IpcChannel channel) throws IOException {
+  
+  }
+  
   // The following processing is running in netty worker group.
   @Override
   public void onData(IpcChannel channel, DataPacket packet) throws IOException {
@@ -36,17 +38,18 @@ public class DaemonDataHandler implements IpcDataHandler<DataPacket> {
       // invoke registry
       StaticAppInfo info = new StaticAppInfo();
       
-      info.setStaticJvmInfo(collectorRegistry
-          .<StaticJvmInfo>collect(StaticJvmInfoCollector.class.getName())
-          .getInfo());
-      
       info.setStaticSysInfo(collectorRegistry
-          .<StaticSysInfo>collect(StaticSysInfoCollector.class.getName())
+          .<StaticSysInfo>collect(CollectorName.STATIC_SYS_INFO_COLLECTOR)
           .getInfo());
       
-      info.setStaticMavenInfo(collectorRegistry
-          .<StaticMavenInfo>collect(StaticMavenInfoCollector.class.getName())
+      info.setStaticJvmInfo(collectorRegistry
+          .<StaticJvmInfo>collect(CollectorName.STATIC_JVM_INFO_COLLECTOR)
           .getInfo());
+      
+      // FIXME: maven info is too bigger (> Integer.MAX_VALUE) that jboss marshalling cannot handle it
+      //info.setStaticMavenInfo(collectorRegistry
+      //    .<StaticMavenInfo>collect(CollectorName.STATIC_MAVEN_INFO_COLLECTOR)
+      //    .getInfo());
       
       // commit to daemon
       channel.write(new DataPacket<>(StubAction.COMMIT_STATIC_APP_INFO,

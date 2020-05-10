@@ -10,6 +10,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public final class ProbeConnector {
   
-  private static final NetURL DEFAULT_BINDING = new NetURL("tcp://localhost:43211");
+  private static final NetURL DEFAULT_BINDING = new NetURL("tcp://localhost:43210");
   
   private EventLoopGroup bossGroup = new NioEventLoopGroup();
   
@@ -44,7 +46,7 @@ public final class ProbeConnector {
   @Autowired
   private ProbeListener probeListener;
   
-  @Value("${mx1.binding:}")
+  @Value("${mx1.ipcAddress:}")
   private String binding;
   
   @PostConstruct
@@ -52,7 +54,7 @@ public final class ProbeConnector {
     NetURL url;
     if (StringUtils.isEmpty(binding)) {
       url = DEFAULT_BINDING;
-      log.info("Starting ProbeConnector on default binding {}", url);
+      log.info("Starting ProbeConnector on default ipcAddress {}", url);
     } else {
       url = new NetURL(binding);
       log.info("Starting ProbeConnector on {}", url);
@@ -76,25 +78,28 @@ public final class ProbeConnector {
     
     ChannelFuture channelFuture = bootstrap.bind(
         new InetSocketAddress(url.getHost(), url.getPort()));
-  
-    // FIXME: we can get a channel from the channelFuture,
+    
+    // NOTE: we can get a channel from the channelFuture,
     //  if we write something through this channel, is that a broadcasting?
+    //  The answer is no, you will get UnsupportedOperationException.
     channelFuture.sync();
-  
+    
     if (channelFuture.isSuccess()) {
       log.info("ProbeConnector is up, listener is {}", probeListener);
     }
   }
   
   private class TcpDataHandler extends ChannelInboundHandlerAdapter {
-  
+    
     public void channelActive(ChannelHandlerContext ctx) {
+      log.info("Connected to probe {}", ctx.channel().remoteAddress());
+      
       Session session = sessionCache.computeIfAbsent(ctx, Session::new);
       probeListener.onConnected(session);
       
       ctx.fireChannelActive();
     }
-  
+    
     @Override
     @SuppressWarnings("unchecked")
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws IOException {
@@ -103,7 +108,7 @@ public final class ProbeConnector {
       
       ctx.fireChannelRead(msg);
     }
-  
+    
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
       Session session = sessionCache.get(ctx);
@@ -111,7 +116,7 @@ public final class ProbeConnector {
       
       ctx.fireExceptionCaught(cause);
     }
-  
+    
     public void channelInactive(ChannelHandlerContext ctx) {
       Session session = sessionCache.remove(ctx);
       probeListener.onDisconnected(session);

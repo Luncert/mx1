@@ -41,7 +41,7 @@ public final class ActionHandlerManager {
     
     log.info("Loaded action handlers: {}", handlerList);
     
-    // group by binding action
+    // group by ipcAddress action
     Map<String, List<AbstractActionHandler>> handlerAfterGroupBy = handlerList.stream()
         .collect(Collectors.groupingBy(AbstractActionHandler::getBindingAction));
     

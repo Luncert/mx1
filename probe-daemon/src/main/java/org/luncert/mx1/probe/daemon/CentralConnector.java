@@ -17,7 +17,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-public class CentralService implements Closeable {
+public class CentralConnector implements Closeable {
   
   private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
   

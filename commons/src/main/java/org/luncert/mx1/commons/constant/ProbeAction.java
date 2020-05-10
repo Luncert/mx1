@@ -8,4 +8,5 @@ public final class ProbeAction {
   public static final String UPDATE_METADATA = "/probe/update/metadata";
   public static final String COMMIT_DYNAMIC_JVM_INFO = "/probe/commit/dynamicJvmInfo";
   public static final String COMMIT_DYNAMIC_SYS_INFO = "/probe/commit/dynamicSystemInfo";
+  public static final String NOTIFY_STUB_DISCONNECTED = "/probe/notify/stubDisconnected";
 }
