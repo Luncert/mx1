@@ -19,6 +19,7 @@
     <module>probe-stub</module>
     <module>probe-spy</module>
     <module>probe-ipc</module>
+    <module>storage</module>
   </modules>
 
   <build>
